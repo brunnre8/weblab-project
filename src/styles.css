@@ -1,0 +1,8 @@
+@import "gruvbox.css";
+
+*,
+*::before,
+*::after {
+	scrollbar-width: thin;
+	box-sizing: border-box;
+}

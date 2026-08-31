@@ -1,0 +1,19 @@
+<mat-card>
+	<mat-card-header>
+		<mat-card-title class='title'>
+			<a routerLink='/title'>
+				{{todo().title}}
+			</a>
+		</mat-card-title>
+	</mat-card-header>
+	<div class="time">
+		<mat-icon inline>calendar_today</mat-icon>
+		<span>{{renderTodoTime(todo())}}</span>
+	</div>
+	<mat-card-content>
+		<p [style.--max-lines]="max_lines_var()">{{todo().body}}</p>
+	</mat-card-content>
+	<!-- <mat-card-actions> -->
+	<!-- 	<button matButton (click)="onEdit($event)"><mat-icon>edit</mat-icon>Edit</button> -->
+	<!-- </mat-card-actions> -->
+</mat-card>
