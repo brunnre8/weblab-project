@@ -36,6 +36,25 @@ Die Applikation soll nach Abschluss live auf einer Domain verfügbar sein und pr
 
 Es wird aus Zeitgründen kein eigenes Design System entwickelt werden und der Fokus wird nicht auf das Design gelegt um den Zeitrahmen nicht zu sprengen.
 
+# Angedachter Technologie Stack
+
+Folgende mittel sind geplant um das ganze umzusetzen, natürlich kann sich dass auch noch ändern wenn bei der design Phase weitere Erkenntnisse gewonnen werden.
+
+Struktur technisch ist ein Monolith angedacht, da die Applikation klein genug ist dass die Skalierbarkeit keine Probleme bereiten sollte und so die Komplexität eingeschränkt werden kann.
+
+**Frontend:**
+
+* TS
+* angular.js
+* angular/material für die Komponenten
+
+**Backend:**
+
+* TS
+* node.js
+* express
+* sqlite
+
 # User stories
 
 ## Todo erstellen
