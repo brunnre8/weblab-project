@@ -1,59 +1,75 @@
-# Playground
+# Web Programming Lab Projekt
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.4.
+Das Projekt im Modul Web Programming Lab ermöglicht es, die gelernten Inhalte aus dem Unterricht direkt anwenden zu können. Der Fokus des Projektes liegt auf die Anwendung von noch nicht bekannten Web Technologien.
 
-## Development server
+## Organisatorisches
 
-To start a local development server, run:
+* Das Projekt wird in **Einzelarbeit** erarbeitet.
+* Sie sollen ein eigenes Projekt umsetzen
+* **Sie** (nicht AI!) sollen ca. 60h in das Projekt investieren (Implementierung & Dokumentation).
+* Die Bewertung des Software-Artefakts erfolgt gemäss folgenden [Anforderungen](./Projekt-Anforderungen.md)
+* Alle erstellten Artefakte sollen im Github-Repository abgegeben werden
 
-```bash
-ng serve
-```
+### Projekt-Vorschlag
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Für das eigene Projekt müssen Sie die Aufgabenbeschreibung bis Mittwoch, 18:00, wie folgt beschreiben (ca. 1 Seite):
 
-## Code scaffolding
+* Kontext (ca. 3 - 5 Sätze)
+* Fachlichkeit als User Stories beschrieben (priorisiert nach dem [MoSCoW-Priorisierung](https://de.wikipedia.org/wiki/MoSCoW-Priorisierung))
+* Angedachter Technologie-Stack
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Projekt-Ergebnisse
 
-```bash
-ng generate component component-name
-```
+Folgende Ergebnisse werden aus der Projektarbeit erwartet:
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+* Architekturdokumentation
+* Fazit & Reflexion
+* Arbeitsjournal
+* Softwareartefakte
 
-```bash
-ng generate --help
-```
+### Architekturdokumentation
 
-## Building
+Wir empfehlen die Architekturdokumentation nach [arc42](https://www.arc42.de/overview/) zu strukturieren. Insbesondere den Kapitel 4 - 10 sollten dabei Beachtung geschenkt werden. Versuchen Sie sich kurz und prägnant zu halten.
 
-To build the project run:
+Hinweise: 
+* Inputs für eine moderne Software Architektur Dokumentation findet sich in diesem [Blog-Post](https://www.workingsoftware.dev/software-architecture-documentation-the-ultimate-guide/).
+* Architekturentscheidungen sollten **nachvollziehbar und begründet** in der Dokumentation niedergeschrieben werden
+  * bspw: Systemarchitektur, gewählte Technolgoien, Qualitätsanforderungen, Softwarearchitektur, Strukturierung von Frontend & Backend (inkl. bewussten Abweichungen davon), _uvm._
+* Die Dokumentation sollte sich an einen Software-Engineer richten (kurz, präzis & prägnant)
+    * Tipp: Diagramme sind oftmals aussagekräftiger als lange textuelle Beschreibungen
 
-```bash
-ng build
-```
+### Fazit & Reflexion
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Im Ergebnis "Fazit & Reflexion" machen Sie die Retrospektive über Ihr Projekt. Dabei sollten Sie die folgenden Fragen beantworten:
 
-## Running unit tests
+* Was ist gut gelaufen?
+* Wo lagen die Herausforderungen?
+* Was würden Sie das nächste Mal anders resp. besser machen?
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+### Arbeitsjournal
 
-```bash
-ng test
-```
+Im Arbeitsjournal erfassen Sie die Tätigkeiten, die Sie für das Projekt geleistet haben. Es dient dazu, zu prüfen ob Sie den Stunden-Leistungsumfang (ca. 60h) für das Modul erreicht haben.
 
-## Running end-to-end tests
+Folgendes sollte es mindestens beinhalten:
 
-For end-to-end (e2e) testing, run:
+* Datum
+* Anzahl Stunden
+* Tätigkeit(en) -> inkl. Total am Schluss
 
-```bash
-ng e2e
-```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### Softwareartefakte
 
-## Additional Resources
+Geben Sie die Software als git Repository ab (z.B. Link auf GitHub, GitLab oder Bitbucket Git Repository).
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Falls Ihnen dies ggf. nicht gelingt, halten Sie das "Warum" im Fazit & Reflexion fest.
+
+## Bewertung
+
+Die Modulnote ergibt sich aus folgenden Projekt-Ergebnissen
+
+* Softwareartefakte 50%
+* Architekturdokumentation 30%
+* Fazit & Reflexion 15%
+* Arbeitsjournal 5%
+
+_Hinweis: Verspätete Abgaben haben einen Notenabzug von 0.5 zur Folge. Abgaben die mehr als 24h später erfolgen, führen zu einer Modulbewertung `F`_

@@ -6,7 +6,7 @@
 	},
 	"newProjectRoot": "projects",
 	"projects": {
-		"playground": {
+		"weblab-project": {
 			"projectType": "application",
 			"schematics": {},
 			"root": "",
@@ -54,10 +54,10 @@
 					"builder": "@angular/build:dev-server",
 					"configurations": {
 						"production": {
-							"buildTarget": "playground:build:production"
+							"buildTarget": "weblab-project:build:production"
 						},
 						"development": {
-							"buildTarget": "playground:build:development"
+							"buildTarget": "weblab-project:build:development"
 						}
 					},
 					"defaultConfiguration": "development"
