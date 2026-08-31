@@ -132,3 +132,13 @@ Ich als Admin will ein Nutzer und alle dessen verfassten Todos löschen können 
 * Nutzer wird gelöscht
 * Alle Todos verfasst vom gelöschten Nutzer werden ebenfalls gelöscht
 * Änderungen persistieren (app restart)
+
+## Logout / Login
+
+Ich als Nutzer will mich ein- und ausloggen können damit ich die Applikation nutzen kann.
+
+*Priorität:* Muss  
+*Akzeptanz Kriterien:* 
+
+* Nutzer kann sich einloggen und ausloggen
+* ausloggen bedeutet dass keine session mehr aktiv ist, selbst wenn ein token client seitig extrahiert wurde
