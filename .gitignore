@@ -1,4 +1,4 @@
-/dist/
-/out-tsc/
-/node_modules/
+node_modules/
+dist/
+out-tsc/
 .angular/
