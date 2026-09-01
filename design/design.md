@@ -141,6 +141,17 @@ Ich als Admin will ein Nutzer editieren können da dieser seine email addresse g
 * Änderung persistiert (app restart)
 * Änderung direkt sichtbar in Liste
 
+## Nutzer deaktivieren
+
+Ich als Admin will ein Nutzer deaktivieren können weil Missbrauch vermutet wird.
+
+*Priorität:* Soll  
+*Akzeptanz Kriterien:* 
+
+* Nutzer kann nicht einloggen
+* Alle Todos verfasst vom deaktivierten Nutzer bleiben erhalten
+* Änderungen persistieren (app restart)
+
 ## Nutzer löschen
 
 Ich als Admin will ein Nutzer und alle dessen verfassten Todos löschen können da er nicht mehr benötigt wird.
