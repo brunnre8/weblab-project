@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { TodoView } from "./todo-view";
 
-import "temporal-polyfill/global"; // monkey patches the temporal API into safari
 import { provideRouter } from "@angular/router";
 
 describe("TodoView", () => {

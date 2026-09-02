@@ -1,12 +1,12 @@
 export class Todo {
 	title: string;
 	body: string;
-	createdAt: Temporal.ZonedDateTime;
+	createdAt: Date;
 
 	constructor(title: string, body: string) {
 		this.title = title;
 		this.body = body;
-		this.createdAt = Temporal.Now.zonedDateTimeISO();
+		this.createdAt = new Date();
 	}
 }
 

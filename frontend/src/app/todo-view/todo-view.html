@@ -8,7 +8,7 @@
 	</mat-card-header>
 	<div class="time">
 		<mat-icon inline>calendar_today</mat-icon>
-		<span>{{renderTodoTime(todo())}}</span>
+		<span>{{todo().createdAt | date}}</span>
 	</div>
 	<mat-card-content>
 		<p [style.--max-lines]="max_lines_var()">{{todo().body}}</p>
