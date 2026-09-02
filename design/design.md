@@ -45,7 +45,7 @@ Struktur technisch ist ein Monolith angedacht, da die Applikation klein genug is
 **Frontend:**
 
 * TS
-* angular.js
+* angular
 * angular/material für die Komponenten
 
 **Backend:**
