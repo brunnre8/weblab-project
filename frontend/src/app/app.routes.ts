@@ -1,5 +1,4 @@
 import { Routes } from "@angular/router";
-import { Hello } from "./hello/hello";
 import { TodoView } from "./todo-view/todo-view";
 
 export const routes: Routes = [
@@ -9,9 +8,9 @@ export const routes: Routes = [
 		title: "Home",
 		component: TodoView,
 	},
-	{
-		path: "hello",
-		title: "Hello",
-		component: Hello,
-	},
+	// {
+	// 	path: "hello",
+	// 	title: "Hello",
+	// 	component: Hello,
+	// },
 ];
