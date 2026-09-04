@@ -1,18 +1,17 @@
 {
 	"$schema": "https://www.schemastore.org/tsconfig",
-	"display": "Node 23",
-	"_version": "23.0.0",
+	"display": "Node next",
 	"compilerOptions": {
 		"module": "nodenext",
-		"target": "es2024",
 		"strict": true,
-		"esModuleInterop": true,
 		"skipLibCheck": true,
-		"moduleResolution": "node16",
 		"typeRoots": [
 			"./node_modules/@types",
 			"./node_moduels/vitest"
-		]
+		],
+		"rewriteRelativeImportExtensions": true,
+		"erasableSyntaxOnly": true,
+		"verbatimModuleSyntax": true
 	},
 	"files": [],
 	"references": [
