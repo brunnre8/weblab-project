@@ -1,11 +1,11 @@
-import { type UserID, type User } from "./models.ts";
+import { type UserID, type User, UserCreds } from "./models.ts";
 
 export interface UserStore {
 	// get user from the store
 	getUserById(id: UserID): Promise<User>;
 
-	// get user from the store
-	getUserByEmail(email: string): Promise<User>;
+	// get user credentials from the store
+	getUserCredsByEmail(email: string): Promise<UserCreds>;
 
 	// List all users in the store
 	listUsers(): Promise<User[]>;
