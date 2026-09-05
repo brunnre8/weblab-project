@@ -22,7 +22,7 @@ export class UserCreds {
 		this.#salt = salt;
 	}
 
-	static async FromPassword(userID: UserID, password: string): Promise<UserCreds> {
+	static async fromPassword(userID: UserID, password: string): Promise<UserCreds> {
 		const salt = await genSalt();
 		const hash = await hashPassword(password, salt);
 		return new UserCreds(userID, hash, salt);
