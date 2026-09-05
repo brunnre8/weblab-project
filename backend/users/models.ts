@@ -1,4 +1,5 @@
 import { scrypt, randomBytes, timingSafeEqual } from "node:crypto";
+
 export type UserID = number;
 export type UserRole = "user" | "admin";
 
