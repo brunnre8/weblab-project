@@ -10,6 +10,6 @@ export interface TodoStore {
 	// insert Todo to the store, returning primary key
 	insertTodo(todo: Todo): Promise<TodoID>;
 
-	// update Todo based on it's primary key
+	// update Todo based on its primary key
 	updateTodo(todo: Todo): Promise<void>;
 }
