@@ -7,5 +7,5 @@ export interface Todo {
 	title: string;
 	body: string;
 	createdAt: Date;
-	owner: UserID;
+	ownerID: UserID;
 }
