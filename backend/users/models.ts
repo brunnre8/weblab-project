@@ -33,6 +33,10 @@ export class UserCreds {
 		const otherHash = await hashPassword(otherPw, this.#salt);
 		return timingSafeEqual(this.#pwHash, otherHash);
 	}
+
+	get userID(): UserID {
+		return this.#userID;
+	}
 }
 
 async function genSalt(): Promise<Buffer> {
