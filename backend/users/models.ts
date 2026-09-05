@@ -39,9 +39,12 @@ export class UserCreds {
 	}
 }
 
+const SALT_BYTES = 16;
+const SCRYPT_KEYLEN = 64;
+
 async function genSalt(): Promise<Buffer> {
 	return new Promise((resolve, reject) => {
-		randomBytes(16, (err, buf) => {
+		randomBytes(SALT_BYTES, (err, buf) => {
 			if (err) {
 				reject(err);
 				return;
@@ -59,7 +62,7 @@ function normalizePw(pw: string): string {
 async function hashPassword(pw: string, salt: Buffer): Promise<Buffer> {
 	const normalizedPw = normalizePw(pw);
 	return new Promise((resolve, reject) => {
-		scrypt(normalizedPw, salt, 64, (err, hash) => {
+		scrypt(normalizedPw, salt, SCRYPT_KEYLEN, (err, hash) => {
 			if (err) {
 				reject(err);
 				return;
