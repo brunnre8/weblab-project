@@ -13,6 +13,8 @@ export function authMw(): RequestHandler {
 			id: 1,
 			name: "admin",
 			role: "admin",
+			email: "admin@localhost",
+			disabled: false,
 		};
 		req.user = user;
 		next();
