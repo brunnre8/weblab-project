@@ -10,6 +10,9 @@ export interface UserStore {
 	// List all users in the store
 	listUsers(): Promise<User[]>;
 
+	// report if there are users in the store
+	hasUsers(): Promise<boolean>;
+
 	// insert user to the store, returning primary key
 	insertUser(user: User): Promise<UserID>;
 
