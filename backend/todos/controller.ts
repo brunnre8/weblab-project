@@ -55,7 +55,7 @@ export class TodoController {
 		});
 	}
 
-	// expects to be mounted at $root/todos/
+	// expects to be mounted at $root/todos
 	router(): Router {
 		return this.#router;
 	}
