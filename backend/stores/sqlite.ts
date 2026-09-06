@@ -1,5 +1,8 @@
+import type { UserStore } from "../users/userStore.ts";
 import type { PathLike } from "node:fs";
-import { DatabaseSync, type DatabaseSyncOptions, type SQLTagStore } from "node:sqlite";
+import { DatabaseSync, type DatabaseSyncOptions, type SQLOutputValue, type SQLTagStore } from "node:sqlite";
+import type { UserID, User, UserCreds } from "../users/models.ts";
+import { ErrNoRows } from "./errors.ts";
 
 const sqliteOptions: DatabaseSyncOptions = {
 	timeout: 5000, //ms
@@ -11,7 +14,7 @@ const sqliteOptions: DatabaseSyncOptions = {
 // https://github.com/WiseLibs/better-sqlite3/blob/HEAD/docs/threads.md
 // node.js is working on an async variant, as soon as that's available we can migrate
 // this.
-export class SqliteStore {
+export class SqliteStore implements UserStore {
 	#db: DatabaseSync;
 	#sql: SQLTagStore;
 
@@ -20,6 +23,47 @@ export class SqliteStore {
 		this.#sql = this.#db.createTagStore();
 		this.runPragmas();
 		this.migrate();
+	}
+
+	async getUserById(id: UserID): Promise<User> {
+		const val = this.#sql.get`SELECT * from users WHERE id = ${id}`;
+		if (val === undefined) {
+			throw new ErrNoRows(`no user with id ${id}`);
+		}
+		return toUser(val);
+	}
+	async getUserCredsByEmail(email: string): Promise<UserCreds> {
+		throw new Error("Method not implemented.");
+	}
+	async listUsers(): Promise<User[]> {
+		return this.#sql.all`SELECT * from users order by id`.map(toUser);
+	}
+	async hasUsers(): Promise<boolean> {
+		const row = this.#sql.get`SELECT 1 from users limit 1;`;
+		return row !== undefined;
+	}
+	async insertUser(user: User): Promise<UserID> {
+		const row = this.#sql.get`
+		INSERT INTO users
+		(name, email, role, disabled)
+		VALUES
+		(${user.name}, ${user.email}, ${user.role}, ${bool(user.disabled)})
+		returning id;
+		`;
+		if (row == undefined) {
+			throw new Error("didn't get uid back from insert");
+		}
+		return row.id as UserID;
+	}
+	async updateUser(user: User): Promise<void> {
+		const changes = this.#sql.run`
+		UPDATE users
+		set name = ${user.name}, email = ${user.email}, role = ${user.role}, disabled = ${bool(user.disabled)}
+		WHERE id = ${user.id}
+		`;
+		if (changes.changes != 1) {
+			throw new ErrNoRows(`no user with id ${user.id}`);
+		}
 	}
 
 	runPragmas() {
@@ -47,8 +91,8 @@ export class SqliteStore {
 			this.#db.exec(stmt);
 		}
 		this.setSchemaVersion(migrations.length);
-		console.log("[SqliteStore]: migrated");
 		this.#db.exec("COMMIT;");
+		console.log("[SqliteStore]: migrated");
 	}
 
 	getSchemaVersion(): number {
@@ -74,17 +118,48 @@ export class SqliteStore {
 	}
 }
 
-var migrations = [
-	"", // new db so full schema is applied
-];
+function bool(b: boolean): number {
+	return b ? 1 : 0;
+}
+
+function toUser(raw: any): User {
+	// sql type isn't helping here so... hope that the tests find the bugs ;)
+	return {
+		id: raw.id,
+		name: raw.name,
+		email: raw.email,
+		disabled: raw.disabled == 1, // sqlite stores int, no bool type
+		role: raw.role,
+	};
+}
 
 // init_schema is the first DB schema ever shipped.
-// Never change this, add migrations
+// Never change this, add migrations instead
 const init_schema = `
 	CREATE TABLE todos (
 		id INTEGER PRIMARY KEY,
 		title TEXT NOT NULL,
 		body TEXT NOT NULL,
-		createdAt DATETIME NOT NULL
+		createdAt DATETIME NOT NULL,
+		ownerID INTEGER UNIQUE NOT NULL REFERENCES users ON DELETE CASCADE
+	);
+
+	CREATE TABLE users (
+		id INTEGER PRIMARY KEY,
+		name TEXT NOT NULL,
+		email TEXT UNIQUE NOT NULL,
+		role TEXT NOT NULL,
+		disabled INTEGER NOT NULL
+	);
+
+	CREATE TABLE user_creds (
+		id INTEGER PRIMARY KEY,
+		userid INTEGER UNIQUE NOT NULL REFERENCES users ON DELETE CASCADE,
+		pwhash BLOB NOT NULL,
+		salt BLOB NOT NULL
 	);
 `;
+
+var migrations = [
+	"", // new db so full schema is applied
+];
