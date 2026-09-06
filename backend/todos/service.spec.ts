@@ -35,6 +35,11 @@ describe("todo service check", () => {
 			await expect(service.listTodos(billyID)).resolves.toHaveLength(1);
 		});
 
+		test("read", async () => {
+			const todo = (await sqliteStore.listTodos(billyID))[0];
+			await expect(service.getTodo(todo.id, billy)).resolves.toStrictEqual(todo);
+		});
+
 		test("insert", async () => {
 			const todo: TodoInput = dummyTodoInput({ ownerID: billyID });
 			await expect(service.insertTodo(todo, billy)).resolves.toMatchObject(todo);

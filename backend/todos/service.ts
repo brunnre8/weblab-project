@@ -58,7 +58,7 @@ export class TodoService {
 			}
 			throw err;
 		}
-		if (canRead(todo, requestor)) {
+		if (!canRead(todo, requestor)) {
 			throw new ErrPerm(`requestor: ${requestor.id} tried to access todo owned by ${todo.ownerID}`);
 		}
 		return todo;
