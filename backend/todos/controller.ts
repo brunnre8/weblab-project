@@ -45,6 +45,14 @@ export class TodoController {
 			await this.#todoService.updateTodo(todoID, updates, user);
 			res.sendStatus(200);
 		});
+
+		// delete
+		this.#router.delete("/:id", async (req, res) => {
+			const user = userFromRequest(req);
+			const todoID: TodoID = safeInt(req.params.id);
+			await this.#todoService.deleteTodo(todoID, user);
+			res.sendStatus(200);
+		});
 	}
 
 	// expects to be mounted at $root/todos/

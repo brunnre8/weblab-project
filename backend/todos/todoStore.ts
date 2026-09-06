@@ -13,4 +13,7 @@ export interface TodoStore {
 
 	// update Todo based on its primary key
 	updateTodo(todo: Todo): Promise<void>;
+
+	// delete todo
+	deleteTodo(id: TodoID): Promise<void>;
 }

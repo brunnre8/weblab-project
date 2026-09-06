@@ -40,6 +40,14 @@ export class TodoService {
 		return this.#todoStore.updateTodo(newtodo);
 	}
 
+	async deleteTodo(todoID: TodoID, requestor: User): Promise<void> {
+		const target = await this.#todoStore.getTodo(todoID);
+		if (!canWrite(target, requestor)) {
+			throw new ErrPerm(`requestor: ${requestor} tried to delete todo owned by ${target.ownerID}`);
+		}
+		return this.#todoStore.deleteTodo(todoID);
+	}
+
 	async getTodo(todoID: TodoID, requestor: User): Promise<Todo> {
 		let todo: Todo;
 		try {

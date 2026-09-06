@@ -108,6 +108,10 @@ describe("sqlite todoStore", () => {
 			await expect(db.listTodos(adminUid)).resolves.toHaveLength(0);
 			await expect(db.listTodos(bobUid)).resolves.toStrictEqual([todo]);
 		});
+
+		test("deletion", async () => {
+			await expect(db.deleteTodo(42)).rejects.toThrow(ErrNoRows);
+		});
 	});
 
 	describe("roundtrips", () => {
@@ -139,6 +143,16 @@ describe("sqlite todoStore", () => {
 			expect(dbList).toHaveLength(2);
 			// sorted by reverse id
 			expect(dbList).toStrictEqual(todoList.sort((a, b) => b.id - a.id));
+		});
+
+		test("deletion", async () => {
+			const todoA = dummyTodo({ title: "one" });
+			const todoB = dummyTodo({ title: "two" });
+			const todoList = [todoA, todoB];
+			[todoA.id, todoB.id] = await Promise.all(todoList.map((u) => db.insertTodo(u)));
+			await db.deleteTodo(todoA.id);
+			const dbList = await db.listTodos(1);
+			expect(dbList).toStrictEqual([todoB]);
 		});
 	});
 

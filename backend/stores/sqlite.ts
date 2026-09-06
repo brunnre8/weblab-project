@@ -117,6 +117,13 @@ export class SqliteStore implements UserStore, TodoStore {
 		}
 	}
 
+	async deleteTodo(id: TodoID): Promise<void> {
+		const changes = this.#sql.run`DELETE FROM todos WHERE id = ${id}`;
+		if (changes.changes != 1) {
+			throw new ErrNoRows(`no todo with id ${id}`);
+		}
+	}
+
 	runPragmas() {
 		this.#db.exec("PRAGMA journal_mode=WAL;");
 	}
