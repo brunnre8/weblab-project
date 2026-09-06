@@ -31,7 +31,7 @@ export class TodoController {
 			const user = userFromRequest(req);
 			const todo = await this.#todoService.insertTodo(input, user);
 			res.status(201);
-			res.send(todo);
+			res.json(todo);
 		});
 
 		// update
