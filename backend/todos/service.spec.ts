@@ -9,20 +9,13 @@ describe("todo service check", () => {
 	let service: TodoService;
 	let sqliteStore: SqliteStore;
 
-	let adminID: UserID;
-	let billyID: UserID;
-	let mariaID: UserID;
-
 	let admin: User;
 	let billy: User;
 	let maria: User;
 
 	beforeEach(async () => {
 		sqliteStore = new SqliteStore(":memory:");
-		[adminID, billyID, mariaID] = await populateDummy(sqliteStore);
-		admin = dummyUser({ name: "admin", id: adminID });
-		billy = dummyUser({ name: "billy", id: billyID });
-		maria = dummyUser({ name: "maria", id: mariaID });
+		[admin, billy, maria] = await populateDummy(sqliteStore);
 		service = new TodoService(sqliteStore);
 	});
 
@@ -32,45 +25,55 @@ describe("todo service check", () => {
 
 	describe("happy path", () => {
 		test("list", async () => {
-			await expect(service.listTodos(billyID)).resolves.toHaveLength(1);
+			await expect(service.listTodos(billy.id)).resolves.toHaveLength(1);
 		});
 
 		test("read", async () => {
-			const todo = (await sqliteStore.listTodos(billyID))[0];
+			const todo = (await sqliteStore.listTodos(billy.id))[0];
 			await expect(service.getTodo(todo.id, billy)).resolves.toStrictEqual(todo);
 		});
 
 		test("insert", async () => {
-			const todo: TodoInput = dummyTodoInput({ ownerID: billyID });
+			const todo: TodoInput = dummyTodoInput({ ownerID: billy.id });
 			await expect(service.insertTodo(todo, billy)).resolves.toMatchObject(todo);
-			await expect(service.listTodos(billyID)).resolves.toHaveLength(2);
+			await expect(service.listTodos(billy.id)).resolves.toHaveLength(2);
 		});
 
 		test("update", async () => {
-			const todo = (await sqliteStore.listTodos(billyID))[0];
+			const todo = (await sqliteStore.listTodos(billy.id))[0];
 			todo.title = "new title";
 			todo.body = "new body";
 			await service.updateTodo(todo.id, todo, billy);
 		});
 
 		test("delete", async () => {
-			const todo = (await sqliteStore.listTodos(billyID))[0];
+			const todo = (await sqliteStore.listTodos(billy.id))[0];
 			todo.title = "new title";
 			todo.body = "new body";
 			await service.deleteTodo(todo.id, billy);
-			await expect(service.listTodos(billyID)).resolves.toHaveLength(0);
+			await expect(service.listTodos(billy.id)).resolves.toHaveLength(0);
+		});
+	});
+
+	describe("admin can do it", () => {
+		test("read", async () => {
+			const todo = (await sqliteStore.listTodos(billy.id))[0];
+			await expect(service.getTodo(todo.id, admin)).resolves.toStrictEqual(todo);
 		});
 	});
 });
 
-async function populateDummy(db: SqliteStore): Promise<[UserID, UserID, UserID]> {
-	const adminID = await db.insertUser(dummyUser({ name: "admin", role: "admin" }));
-	const billyID = await db.insertUser(dummyUser({ name: "billy" }));
-	const mariaID = await db.insertUser(dummyUser({ name: "maria" }));
-	await db.insertTodo(dummyTodo({ title: "admin todo", ownerID: adminID }));
-	await db.insertTodo(dummyTodo({ title: "billy Todo", ownerID: billyID }));
-	await db.insertTodo(dummyTodo({ title: "maria todo", ownerID: mariaID }));
-	return [adminID, billyID, mariaID];
+async function populateDummy(db: SqliteStore): Promise<[User, User, User]> {
+	const admin = dummyUser({ name: "admin", role: "admin" });
+	admin.id = await db.insertUser(admin);
+	const billy = dummyUser({ name: "billy" });
+	billy.id = await db.insertUser(billy);
+	const maria = dummyUser({ name: "maria" });
+	maria.id = await db.insertUser(maria);
+	await db.insertTodo(dummyTodo({ title: "admin todo", ownerID: admin.id }));
+	await db.insertTodo(dummyTodo({ title: "billy Todo", ownerID: billy.id }));
+	await db.insertTodo(dummyTodo({ title: "maria todo", ownerID: maria.id }));
+	return [admin, billy, maria];
 }
 
 function dummyTodoInput(props: Partial<Todo>): TodoInput {
