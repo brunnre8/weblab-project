@@ -4,7 +4,7 @@ import { TodoService } from "./service.ts";
 import { dummyTodo, dummyUser } from "../stores/sqlite.spec.ts";
 import type { User, UserID } from "../users/models.ts";
 import type { Todo, TodoInput } from "./models.ts";
-import { ErrPerm } from "../middlewares/errors.ts";
+import { ErrNoEnt, ErrPerm } from "../middlewares/errors.ts";
 
 describe("todo service check", () => {
 	let service: TodoService;
@@ -60,6 +60,12 @@ describe("todo service check", () => {
 		test("get - admins", async () => {
 			const todo = (await sqliteStore.listTodos(billy.id))[0];
 			await expect(service.getTodo(todo.id, admin)).resolves.toStrictEqual(todo);
+		});
+	});
+
+	describe("404s", () => {
+		test("get", async () => {
+			await expect(service.getTodo(42, billy)).rejects.toThrow(ErrNoEnt);
 		});
 	});
 
