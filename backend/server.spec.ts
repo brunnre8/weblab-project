@@ -2,7 +2,7 @@ import { test, describe, beforeEach, afterEach, expect } from "vitest";
 import { type Express } from "express";
 import request, { type SuperTestStatic } from "supertest";
 
-import { createExpressApp } from "./server.ts";
+import { createExpressApp } from "./express_setup.ts";
 import { dummyAdminUser } from "./middlewares/auth.ts";
 import { SqliteStore } from "./stores/sqlite.ts";
 import type { User } from "./users/models.ts";
