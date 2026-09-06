@@ -28,7 +28,7 @@ export class TodoService {
 	async updateTodo(updateId: TodoID, updates: TodoInput, requestor: User): Promise<void> {
 		const original = await this.#todoStore.getTodo(updateId);
 		if (!canWrite(original, requestor)) {
-			throw new ErrPerm(`requestor: ${requestor} tried to write todo owned by ${original.ownerID}`);
+			throw new ErrPerm(`requestor: ${requestor.id} tried to write todo owned by ${original.ownerID}`);
 		}
 		const newtodo: Todo = {
 			...original,
@@ -43,7 +43,7 @@ export class TodoService {
 	async deleteTodo(todoID: TodoID, requestor: User): Promise<void> {
 		const target = await this.#todoStore.getTodo(todoID);
 		if (!canWrite(target, requestor)) {
-			throw new ErrPerm(`requestor: ${requestor} tried to delete todo owned by ${target.ownerID}`);
+			throw new ErrPerm(`requestor: ${requestor.id} tried to delete todo owned by ${target.ownerID}`);
 		}
 		return this.#todoStore.deleteTodo(todoID);
 	}
@@ -59,7 +59,7 @@ export class TodoService {
 			throw err;
 		}
 		if (canRead(todo, requestor)) {
-			throw new ErrPerm(`requestor: ${requestor} tried to access todo owned by ${todo.ownerID}`);
+			throw new ErrPerm(`requestor: ${requestor.id} tried to access todo owned by ${todo.ownerID}`);
 		}
 		return todo;
 	}
