@@ -164,7 +164,7 @@ describe("sqlite todoStore", () => {
 	});
 });
 
-function dummyUser(props?: Partial<User>): User {
+export function dummyUser(props?: Partial<User>): User {
 	return {
 		id: -1,
 		name: "dummy",
@@ -177,7 +177,7 @@ function dummyUser(props?: Partial<User>): User {
 	};
 }
 
-function dummyTodo(props?: Partial<Todo>): Todo {
+export function dummyTodo(props?: Partial<Todo>): Todo {
 	return {
 		id: -1,
 		title: "Dummy title",
