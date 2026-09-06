@@ -13,7 +13,6 @@ describe("sqlite", () => {
 
 	describe("404s", () => {
 		test("getUserById", async () => {
-			console.log(dummyUser());
 			await expect(db.getUserById(-1)).rejects.toThrow(ErrNoRows);
 		});
 
