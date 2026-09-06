@@ -4,6 +4,7 @@ import { TodoService } from "./service.ts";
 import { dummyTodo, dummyUser } from "../stores/sqlite.spec.ts";
 import type { User, UserID } from "../users/models.ts";
 import type { Todo, TodoInput } from "./models.ts";
+import { ErrPerm } from "../middlewares/errors.ts";
 
 describe("todo service check", () => {
 	let service: TodoService;
@@ -56,9 +57,52 @@ describe("todo service check", () => {
 	});
 
 	describe("admin can do it", () => {
-		test("read", async () => {
+		test("get - admins", async () => {
 			const todo = (await sqliteStore.listTodos(billy.id))[0];
 			await expect(service.getTodo(todo.id, admin)).resolves.toStrictEqual(todo);
+		});
+	});
+
+	describe("no permission", () => {
+		test("get - users", async () => {
+			const todo = (await sqliteStore.listTodos(billy.id))[0];
+			await expect(service.getTodo(todo.id, maria)).rejects.toThrow(ErrPerm);
+		});
+
+		test("delete - admins", async () => {
+			const todo = (await sqliteStore.listTodos(billy.id))[0];
+			await expect(service.deleteTodo(todo.id, admin)).rejects.toThrow(ErrPerm);
+		});
+
+		test("delete - users", async () => {
+			const todo = (await sqliteStore.listTodos(billy.id))[0];
+			await expect(service.deleteTodo(todo.id, maria)).rejects.toThrow(ErrPerm);
+		});
+
+		test("update - admins", async () => {
+			const todo = (await sqliteStore.listTodos(billy.id))[0];
+			todo.title = "new title";
+			todo.body = "new body";
+			await expect(service.deleteTodo(todo.id, admin)).rejects.toThrow(ErrPerm);
+		});
+
+		test("update - users", async () => {
+			const todo = (await sqliteStore.listTodos(billy.id))[0];
+			todo.title = "new title";
+			todo.body = "new body";
+			await expect(service.deleteTodo(todo.id, maria)).rejects.toThrow(ErrPerm);
+		});
+
+		test("insert forces owner - admins", async () => {
+			const todo = dummyTodoInput({ ownerID: billy.id });
+			const newTodo = await service.insertTodo(todo, admin);
+			expect(newTodo.ownerID).toBe(admin.id);
+		});
+
+		test("insert forces owner - users", async () => {
+			const todo = dummyTodoInput({ ownerID: billy.id });
+			const newTodo = await service.insertTodo(todo, maria);
+			expect(newTodo.ownerID).toBe(maria.id);
 		});
 	});
 });
