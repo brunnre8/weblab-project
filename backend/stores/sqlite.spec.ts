@@ -120,6 +120,13 @@ describe("sqlite todoStore", () => {
 			expect(dbList).toStrictEqual(todoList);
 		});
 	});
+
+	describe("validity", () => {
+		test("Invalid owner", async () => {
+			const todo = dummyTodo({ ownerID: 42 });
+			await expect(db.insertTodo(todo)).rejects.toThrow(/constraint failed/);
+		});
+	});
 });
 
 function dummyUser(props?: Partial<User>): User {
