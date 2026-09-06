@@ -30,6 +30,7 @@ describe("sqlite", () => {
 		test("getUserById", async () => {
 			const user = dummyUser({ role: "admin" });
 			user.id = await db.insertUser(user);
+			// we want the userid to be ignored for inserts
 			expect(user.id).not.toBe(-1);
 			const dbUser = await db.getUserById(user.id);
 			expect(dbUser).toStrictEqual(user);
