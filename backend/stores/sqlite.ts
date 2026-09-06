@@ -32,16 +32,20 @@ export class SqliteStore implements UserStore {
 		}
 		return toUser(val);
 	}
+
 	async getUserCredsByEmail(email: string): Promise<UserCreds> {
 		throw new Error("Method not implemented.");
 	}
+
 	async listUsers(): Promise<User[]> {
 		return this.#sql.all`SELECT * from users order by id`.map(toUser);
 	}
+
 	async hasUsers(): Promise<boolean> {
 		const row = this.#sql.get`SELECT 1 from users limit 1;`;
 		return row !== undefined;
 	}
+
 	async insertUser(user: User): Promise<UserID> {
 		const row = this.#sql.get`
 		INSERT INTO users
@@ -55,6 +59,7 @@ export class SqliteStore implements UserStore {
 		}
 		return row.id as UserID;
 	}
+
 	async updateUser(user: User): Promise<void> {
 		const changes = this.#sql.run`
 		UPDATE users
