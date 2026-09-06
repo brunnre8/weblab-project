@@ -16,9 +16,9 @@ export class TodoController {
 
 	private registerRoutes() {
 		// read
-		this.#router.get("/", (req, res) => {
+		this.#router.get("/", async (req, res) => {
 			const user = userFromRequest(req);
-			const todos = this.#todoService.listTodos(user.id);
+			const todos = await this.#todoService.listTodos(user.id);
 			res.json(todos);
 		});
 
