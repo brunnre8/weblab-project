@@ -1,6 +1,7 @@
 import express, { type ErrorRequestHandler } from "express";
 import type { AddressInfo } from "node:net";
 import { authMw, dummyAdminUser, userFromRequest } from "./middlewares/auth.ts";
+import { permissionErrorMw, noEntityErrorMw, badInputErrorMw, internalErrorMw } from "./middlewares/errors.ts";
 import { SqliteStore } from "./stores/sqlite.ts";
 
 async function main() {
@@ -12,7 +13,10 @@ async function main() {
 
 	const app = express();
 	app.disable("x-powered-by");
-	app.use(errorHandler);
+	app.use(permissionErrorMw());
+	app.use(noEntityErrorMw());
+	app.use(badInputErrorMw());
+	app.use(internalErrorMw()); // keep this last
 
 	const apiRouter = express.Router();
 	apiRouter.use(authMw());
@@ -58,10 +62,5 @@ function printAddr(addr: string | AddressInfo) {
 	}
 	console.log(`started on ${listener}`);
 }
-
-const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
-	console.error(err.stack);
-	res.sendStatus(500);
-};
 
 await main();
