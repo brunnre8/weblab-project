@@ -95,7 +95,18 @@ describe("sqlite todoStore", () => {
 		});
 
 		test("listTodos", async () => {
-			await expect(db.listTodos()).resolves.toHaveLength(0);
+			await expect(db.listTodos(1)).resolves.toHaveLength(0);
+		});
+
+		test("listTodos author filter", async () => {
+			const bobUid = await sqliteStore.insertUser(dummyUser({ name: "bob" }));
+			const evaUid = await sqliteStore.insertUser(dummyUser({ name: "Eva" }));
+			const todo = dummyTodo({ ownerID: bobUid });
+			todo.id = await sqliteStore.insertTodo(todo);
+			await sqliteStore.insertTodo(dummyTodo({ title: "never matches", ownerID: evaUid }));
+			const adminUid = 1;
+			await expect(db.listTodos(adminUid)).resolves.toHaveLength(0);
+			await expect(db.listTodos(bobUid)).resolves.toStrictEqual([todo]);
 		});
 	});
 
@@ -124,9 +135,10 @@ describe("sqlite todoStore", () => {
 			const todoB = dummyTodo({ title: "two" });
 			const todoList = [todoA, todoB];
 			[todoA.id, todoB.id] = await Promise.all(todoList.map((u) => db.insertTodo(u)));
-			const dbList = await db.listTodos();
+			const dbList = await db.listTodos(1);
 			expect(dbList).toHaveLength(2);
-			expect(dbList).toStrictEqual(todoList);
+			// sorted by reverse id
+			expect(dbList).toStrictEqual(todoList.sort((a, b) => b.id - a.id));
 		});
 	});
 

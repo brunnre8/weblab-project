@@ -81,8 +81,13 @@ export class SqliteStore implements UserStore, TodoStore {
 		return toTodo(val);
 	}
 
-	async listTodos(): Promise<Todo[]> {
-		return this.#sql.all`SELECT * from todos order by id`.map(toTodo);
+	async listTodos(ownerID: UserID): Promise<Todo[]> {
+		return this.#sql.all`
+			SELECT *
+			FROM todos
+			WHERE ownerID = ${ownerID}
+			ORDER BY id DESC
+		`.map(toTodo);
 	}
 
 	async insertTodo(todo: Todo): Promise<TodoID> {
