@@ -1,6 +1,6 @@
-import express, { type ErrorRequestHandler } from "express";
+import express from "express";
 import type { AddressInfo } from "node:net";
-import { authMw, dummyAdminUser, userFromRequest } from "./middlewares/auth.ts";
+import { authMw, dummyAdminUser } from "./middlewares/auth.ts";
 import { permissionErrorMw, noEntityErrorMw, badInputErrorMw, internalErrorMw } from "./middlewares/errors.ts";
 import { SqliteStore } from "./stores/sqlite.ts";
 import { TodoController } from "./todos/controller.ts";
