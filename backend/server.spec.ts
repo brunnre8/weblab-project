@@ -9,7 +9,7 @@ import type { User } from "./users/models.ts";
 import { dummyTodo, dummyUser } from "./stores/sqlite.spec.ts";
 import type { Todo, TodoInput } from "./todos/models.ts";
 
-describe("express setup", () => {
+describe("server integration test", () => {
 	let app: Express;
 	let store: SqliteStore;
 	let req: ReturnType<SuperTestStatic>;
