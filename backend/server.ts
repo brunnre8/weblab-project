@@ -3,6 +3,8 @@ import type { AddressInfo } from "node:net";
 import { authMw, dummyAdminUser, userFromRequest } from "./middlewares/auth.ts";
 import { permissionErrorMw, noEntityErrorMw, badInputErrorMw, internalErrorMw } from "./middlewares/errors.ts";
 import { SqliteStore } from "./stores/sqlite.ts";
+import { TodoController } from "./todos/controller.ts";
+import { TodoService } from "./todos/service.ts";
 
 async function main() {
 	const store = new SqliteStore(":memory:");
@@ -20,12 +22,7 @@ async function main() {
 
 	const apiRouter = express.Router();
 	apiRouter.use(authMw());
-
-	apiRouter.get("/user", async (req, res) => {
-		const user = userFromRequest(req);
-		res.status(200);
-		res.json(user);
-	});
+	apiRouter.use("/todos", new TodoController(new TodoService(store)).router());
 
 	app.use("/api", apiRouter);
 
