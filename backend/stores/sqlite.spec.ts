@@ -1,4 +1,4 @@
-import { test, describe, beforeEach, expect } from "vitest";
+import { test, describe, beforeEach, afterEach, expect } from "vitest";
 import { SqliteStore } from "./sqlite.ts";
 import { ErrNoRows } from "./errors.ts";
 import type { User } from "../users/models.ts";
@@ -8,9 +8,14 @@ import type { Todo } from "../todos/models.ts";
 
 describe("sqlite userStore", () => {
 	let db: UserStore;
+	let sqliteStore: SqliteStore;
 
 	beforeEach(() => {
-		db = new SqliteStore(":memory:");
+		db = sqliteStore = new SqliteStore(":memory:");
+	});
+
+	afterEach(() => {
+		sqliteStore.close();
 	});
 
 	describe("404s", () => {
@@ -69,11 +74,15 @@ describe("sqlite userStore", () => {
 
 describe("sqlite todoStore", () => {
 	let db: TodoStore;
+	let sqliteStore: SqliteStore;
 
 	beforeEach(async () => {
-		const sqliteDB = new SqliteStore(":memory:");
-		db = sqliteDB;
-		await sqliteDB.insertUser(dummyUser({ role: "admin" }));
+		db = sqliteStore = new SqliteStore(":memory:");
+		await sqliteStore.insertUser(dummyUser({ role: "admin" }));
+	});
+
+	afterEach(() => {
+		sqliteStore.close();
 	});
 
 	describe("404s", () => {
