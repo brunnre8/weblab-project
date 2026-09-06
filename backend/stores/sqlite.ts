@@ -75,7 +75,6 @@ export class SqliteStore implements UserStore {
 	}
 
 	migrateVersion(length: number) {
-		console.log("[SqliteStore]: running migrations, this can take a while...");
 		this.#db.exec("BEGIN EXCLUSIVE TRANSACTION;");
 		const dbVersion = this.getSchemaVersion();
 		if (dbVersion === 0) {
@@ -92,7 +91,6 @@ export class SqliteStore implements UserStore {
 		}
 		this.setSchemaVersion(migrations.length);
 		this.#db.exec("COMMIT;");
-		console.log("[SqliteStore]: migrated");
 	}
 
 	getSchemaVersion(): number {
