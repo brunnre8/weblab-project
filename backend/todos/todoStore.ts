@@ -9,7 +9,7 @@ export interface TodoStore {
 	listTodos(ownerID: UserID): Promise<Todo[]>;
 
 	// insert Todo to the store, returning primary key
-	insertTodo(todo: Todo): Promise<TodoID>;
+	insertTodo(todo: Omit<Todo, "id">): Promise<TodoID>;
 
 	// update Todo based on its primary key
 	updateTodo(todo: Todo): Promise<void>;

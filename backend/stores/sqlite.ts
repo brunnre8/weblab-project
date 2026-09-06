@@ -90,7 +90,7 @@ export class SqliteStore implements UserStore, TodoStore {
 		`.map(toTodo);
 	}
 
-	async insertTodo(todo: Todo): Promise<TodoID> {
+	async insertTodo(todo: Omit<Todo, "id">): Promise<TodoID> {
 		const row = this.#sql.get`
 		INSERT INTO todos
 		(title, body, createdAt, ownerID)
