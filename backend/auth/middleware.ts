@@ -9,14 +9,7 @@ import { type User } from "../users/models.ts";
 export function authMw(): RequestHandler {
 	return (req: any, _res, next) => {
 		//TODO: actually implement this
-		const user: User = {
-			id: 1,
-			name: "admin",
-			role: "admin",
-			email: "admin@localhost",
-			disabled: false,
-		};
-		req.user = user;
+		req.user = dummyAdminUser();
 		next();
 	};
 }
@@ -27,4 +20,14 @@ export function userFromRequest(req: Request): User {
 		throw new Error("no user present, ensure authMw is in the middleware chain before you call this function");
 	}
 	return user;
+}
+
+export function dummyAdminUser(): User {
+	return {
+		id: 1,
+		name: "admin",
+		role: "admin",
+		email: "admin@localhost",
+		disabled: false,
+	};
 }

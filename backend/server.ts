@@ -1,10 +1,14 @@
 import express, { type ErrorRequestHandler } from "express";
 import type { AddressInfo } from "node:net";
-import { authMw, userFromRequest } from "./auth/middleware.ts";
+import { authMw, dummyAdminUser, userFromRequest } from "./auth/middleware.ts";
 import { SqliteStore } from "./stores/sqlite.ts";
 
-function main() {
+async function main() {
 	const store = new SqliteStore(":memory:");
+
+	if (!(await store.hasUsers())) {
+		await store.insertUser(dummyAdminUser());
+	}
 
 	const app = express();
 	app.disable("x-powered-by");
@@ -60,4 +64,4 @@ const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
 	res.sendStatus(500);
 };
 
-main();
+await main();
