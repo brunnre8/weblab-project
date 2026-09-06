@@ -3,6 +3,8 @@ import type { PathLike } from "node:fs";
 import { DatabaseSync, type DatabaseSyncOptions, type SQLOutputValue, type SQLTagStore } from "node:sqlite";
 import type { UserID, User, UserCreds } from "../users/models.ts";
 import { ErrNoRows } from "./errors.ts";
+import type { TodoStore } from "../todos/todoStore.ts";
+import type { TodoID, Todo } from "../todos/models.ts";
 
 const sqliteOptions: DatabaseSyncOptions = {
 	timeout: 5000, //ms
@@ -14,7 +16,7 @@ const sqliteOptions: DatabaseSyncOptions = {
 // https://github.com/WiseLibs/better-sqlite3/blob/HEAD/docs/threads.md
 // node.js is working on an async variant, as soon as that's available we can migrate
 // this.
-export class SqliteStore implements UserStore {
+export class SqliteStore implements UserStore, TodoStore {
 	#db: DatabaseSync;
 	#sql: SQLTagStore;
 
@@ -68,6 +70,45 @@ export class SqliteStore implements UserStore {
 		`;
 		if (changes.changes != 1) {
 			throw new ErrNoRows(`no user with id ${user.id}`);
+		}
+	}
+
+	async getTodo(id: TodoID): Promise<Todo> {
+		const val = this.#sql.get`SELECT * from todos WHERE id = ${id}`;
+		if (val === undefined) {
+			throw new ErrNoRows(`no todo with id ${id}`);
+		}
+		return toTodo(val);
+	}
+
+	async listTodos(): Promise<Todo[]> {
+		return this.#sql.all`SELECT * from todos order by id`.map(toTodo);
+	}
+
+	async insertTodo(todo: Todo): Promise<TodoID> {
+		const row = this.#sql.get`
+		INSERT INTO todos
+		(title, body, createdAt, ownerID)
+		VALUES
+		(${todo.title}, ${todo.body}, ${sqDate(todo.createdAt)}, ${todo.ownerID})
+		returning id;
+		`;
+		if (row == undefined) {
+			throw new Error("didn't get id back from insert");
+		}
+		return row.id as TodoID;
+	}
+
+	async updateTodo(todo: Todo): Promise<void> {
+		const changes = this.#sql.run`
+		UPDATE todos
+		set
+			title = ${todo.title}, body = ${todo.body}, createdAt = ${sqDate(todo.createdAt)},
+			ownerID = ${todo.ownerID}
+		WHERE id = ${todo.id}
+		`;
+		if (changes.changes != 1) {
+			throw new ErrNoRows(`no user with id ${todo.id}`);
 		}
 	}
 
@@ -125,6 +166,14 @@ function bool(b: boolean): number {
 	return b ? 1 : 0;
 }
 
+function sqDate(d: Date): number {
+	return d.valueOf();
+}
+
+function fromSqDate(d: number): Date {
+	return new Date(d);
+}
+
 function toUser(raw: any): User {
 	// sql type isn't helping here so... hope that the tests find the bugs ;)
 	return {
@@ -136,6 +185,16 @@ function toUser(raw: any): User {
 	};
 }
 
+function toTodo(raw: any): Todo {
+	return {
+		id: raw.id,
+		title: raw.title,
+		body: raw.body,
+		createdAt: fromSqDate(raw.createdAt),
+		ownerID: raw.ownerID,
+	};
+}
+
 // init_schema is the first DB schema ever shipped.
 // Never change this, add migrations instead
 const init_schema = `
@@ -144,7 +203,7 @@ const init_schema = `
 		title TEXT NOT NULL,
 		body TEXT NOT NULL,
 		createdAt DATETIME NOT NULL,
-		ownerID INTEGER UNIQUE NOT NULL REFERENCES users ON DELETE CASCADE
+		ownerID INTEGER NOT NULL REFERENCES users ON DELETE CASCADE
 	);
 
 	CREATE TABLE users (

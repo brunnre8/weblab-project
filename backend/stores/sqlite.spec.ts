@@ -3,8 +3,10 @@ import { SqliteStore } from "./sqlite.ts";
 import { ErrNoRows } from "./errors.ts";
 import { type User } from "../users/models.ts";
 import { type UserStore } from "../users/userStore.ts";
+import type { TodoStore } from "../todos/todoStore.ts";
+import type { Todo } from "../todos/models.ts";
 
-describe("sqlite", () => {
+describe("sqlite userStore", () => {
 	let db: UserStore;
 
 	beforeEach(() => {
@@ -65,6 +67,61 @@ describe("sqlite", () => {
 	});
 });
 
+describe("sqlite todoStore", () => {
+	let db: TodoStore;
+
+	beforeEach(async () => {
+		const sqliteDB = new SqliteStore(":memory:");
+		db = sqliteDB;
+		await sqliteDB.insertUser(dummyUser({ role: "admin" }));
+	});
+
+	describe("404s", () => {
+		test("getTodo", async () => {
+			await expect(db.getTodo(-1)).rejects.toThrow(ErrNoRows);
+		});
+
+		test("updateTodo", async () => {
+			await expect(db.updateTodo(dummyTodo())).rejects.toThrow(ErrNoRows);
+		});
+
+		test("listTodos", async () => {
+			await expect(db.listTodos()).resolves.toHaveLength(0);
+		});
+	});
+
+	describe("roundtrips", () => {
+		test("getTodo", async () => {
+			const todo = dummyTodo();
+			todo.id = await db.insertTodo(todo);
+			// we want the userid to be ignored for inserts
+			expect(todo.id).not.toBe(-1);
+			const dbtodo = await db.getTodo(todo.id);
+			expect(dbtodo).toStrictEqual(todo);
+		});
+
+		test("updateTodo", async () => {
+			const todo = dummyTodo();
+			todo.id = await db.insertTodo(todo);
+			todo.body = "new body";
+			todo.title = "new title";
+			expect(db.updateTodo(todo)).resolves;
+			const dbTodo = await db.getTodo(todo.id);
+			expect(dbTodo).toStrictEqual(todo);
+		});
+
+		test("listTodos", async () => {
+			const todoA = dummyTodo({ title: "one" });
+			const todoB = dummyTodo({ title: "two" });
+			const todoList = [todoA, todoB];
+			[todoA.id, todoB.id] = await Promise.all(todoList.map((u) => db.insertTodo(u)));
+			const dbList = await db.listTodos();
+			expect(dbList).toHaveLength(2);
+			expect(dbList).toStrictEqual(todoList);
+		});
+	});
+});
+
 function dummyUser(props?: Partial<User>): User {
 	return {
 		id: -1,
@@ -74,6 +131,17 @@ function dummyUser(props?: Partial<User>): User {
 		disabled: false,
 		// email has a unique constraint, so ensure we don't collide by default
 		...(props?.name ? { email: props.name + "@example.com" } : {}),
+		...props,
+	};
+}
+
+function dummyTodo(props?: Partial<Todo>): Todo {
+	return {
+		id: -1,
+		title: "Dummy title",
+		body: "Lorem ipsum dolor achmet...",
+		createdAt: new Date(),
+		ownerID: 1,
 		...props,
 	};
 }
