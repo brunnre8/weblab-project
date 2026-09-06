@@ -1,8 +1,8 @@
 import { test, describe, beforeEach, expect } from "vitest";
 import { SqliteStore } from "./sqlite.ts";
 import { ErrNoRows } from "./errors.ts";
-import { type User } from "../users/models.ts";
-import { type UserStore } from "../users/userStore.ts";
+import type { User } from "../users/models.ts";
+import type { UserStore } from "../users/userStore.ts";
 import type { TodoStore } from "../todos/todoStore.ts";
 import type { Todo } from "../todos/models.ts";
 
