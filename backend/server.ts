@@ -1,10 +1,12 @@
-import express from "express";
+import express, { type Express } from "express";
 import type { AddressInfo } from "node:net";
 import { authMw, dummyAdminUser } from "./middlewares/auth.ts";
 import { permissionErrorMw, noEntityErrorMw, badInputErrorMw, internalErrorMw } from "./middlewares/errors.ts";
 import { SqliteStore } from "./stores/sqlite.ts";
 import { TodoController } from "./todos/controller.ts";
 import { TodoService } from "./todos/service.ts";
+import type { TodoStore } from "./todos/todoStore.ts";
+import type { UserStore } from "./users/userStore.ts";
 
 async function main() {
 	const store = new SqliteStore(":memory:");
@@ -13,18 +15,7 @@ async function main() {
 		await store.insertUser(dummyAdminUser());
 	}
 
-	const app = express();
-	app.disable("x-powered-by");
-	app.use(permissionErrorMw());
-	app.use(noEntityErrorMw());
-	app.use(badInputErrorMw());
-	app.use(internalErrorMw()); // keep this last
-
-	const apiRouter = express.Router();
-	apiRouter.use(authMw());
-	apiRouter.use("/todos", new TodoController(new TodoService(store)).router());
-
-	app.use("/api", apiRouter);
+	const app = createExpressApp(store);
 
 	const server = app.listen(4444, (err) => {
 		if (err) {
@@ -45,6 +36,22 @@ async function main() {
 			console.log("Store closed");
 		});
 	});
+}
+
+export function createExpressApp(store: TodoStore & UserStore): Express {
+	const app = express();
+	app.disable("x-powered-by");
+	app.use(permissionErrorMw());
+	app.use(noEntityErrorMw());
+	app.use(badInputErrorMw());
+	app.use(internalErrorMw()); // keep this last
+
+	const apiRouter = express.Router();
+	apiRouter.use(authMw());
+	apiRouter.use("/todos", new TodoController(new TodoService(store)).router());
+
+	app.use("/api", apiRouter);
+	return app;
 }
 
 function printAddr(addr: string | AddressInfo) {
