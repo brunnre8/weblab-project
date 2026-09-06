@@ -1,8 +1,8 @@
 import { test, describe, beforeEach, expect } from "vitest";
 import { SqliteStore } from "./sqlite.ts";
 import { ErrNoRows } from "./errors.ts";
-import { User } from "../users/models.ts";
-import { UserStore } from "../users/userStore.ts";
+import { type User } from "../users/models.ts";
+import { type UserStore } from "../users/userStore.ts";
 
 describe("sqlite", () => {
 	let db: UserStore;
@@ -45,7 +45,22 @@ describe("sqlite", () => {
 		});
 
 		test("listUsers", async () => {
-			await expect(db.listUsers()).resolves.toHaveLength(0);
+			const userA = dummyUser({ name: "billy" });
+			const userB = dummyUser({ name: "marry" });
+			const userList = [userA, userB];
+			[userA.id, userB.id] = await Promise.all(userList.map((u) => db.insertUser(u)));
+			const dbList = await db.listUsers();
+			expect(dbList).toHaveLength(2);
+			expect(dbList).toStrictEqual(userList);
+		});
+	});
+
+	describe("validity", () => {
+		test("duplicate email disallowed", async () => {
+			const userA = dummyUser({ name: "billy", email: "one@example.com" });
+			const userB = dummyUser({ name: "marry", email: "one@example.com" });
+			await db.insertUser(userA);
+			await expect(db.insertUser(userB)).rejects.toThrow(/email/);
 		});
 	});
 });
@@ -57,6 +72,8 @@ function dummyUser(props?: Partial<User>): User {
 		email: "dummy@example.com",
 		role: "user",
 		disabled: false,
+		// email has a unique constraint, so ensure we don't collide by default
+		...(props?.name ? { email: props.name + "@example.com" } : {}),
 		...props,
 	};
 }
