@@ -1,6 +1,6 @@
 import express, { type ErrorRequestHandler } from "express";
 import type { AddressInfo } from "node:net";
-import { authMw, dummyAdminUser, userFromRequest } from "./auth/middleware.ts";
+import { authMw, dummyAdminUser, userFromRequest } from "./middlewares/auth.ts";
 import { SqliteStore } from "./stores/sqlite.ts";
 
 async function main() {
