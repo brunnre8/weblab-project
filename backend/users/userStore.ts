@@ -7,6 +7,9 @@ export interface UserStore {
 	// get user credentials from the store
 	getUserCredsByEmail(email: string): Promise<UserCreds>;
 
+	// insert user credentials into the store
+	insertUserCreds(creds: UserCreds): Promise<void>;
+
 	// List all users in the store
 	listUsers(): Promise<User[]>;
 

@@ -1,7 +1,7 @@
 import { test, describe, beforeEach, afterEach, expect } from "vitest";
 import { SqliteStore } from "./sqlite.ts";
 import { ErrNoRows } from "./errors.ts";
-import type { User } from "../users/models.ts";
+import { UserCreds, type User, type UserID } from "../users/models.ts";
 import type { UserStore } from "../users/userStore.ts";
 import type { TodoStore } from "../todos/todoStore.ts";
 import type { Todo } from "../todos/models.ts";
@@ -29,6 +29,10 @@ describe("sqlite userStore", () => {
 
 		test("listUsers", async () => {
 			await expect(db.listUsers()).resolves.toHaveLength(0);
+		});
+
+		test("userCreds", async () => {
+			await expect(db.getUserCredsByEmail("404@example.com")).rejects.toThrow(ErrNoRows);
 		});
 	});
 
@@ -59,6 +63,15 @@ describe("sqlite userStore", () => {
 			const dbList = await db.listUsers();
 			expect(dbList).toHaveLength(2);
 			expect(dbList).toStrictEqual(userList);
+		});
+
+		test("userCreds", async () => {
+			const user = dummyUser({ role: "user" });
+			user.id = await db.insertUser(user);
+			const creds = await dummyUserCreds(user.id);
+			await db.insertUserCreds(creds);
+			const fromDb = await db.getUserCredsByEmail(user.email);
+			expect(compareCreds(creds, fromDb)).toBe(true);
 		});
 	});
 
@@ -186,4 +199,18 @@ export function dummyTodo(props?: Partial<Todo>): Todo {
 		ownerID: 1,
 		...props,
 	};
+}
+
+async function dummyUserCreds(userid?: UserID, pw?: string) {
+	if (userid === undefined) {
+		userid = 1;
+	}
+	if (pw === undefined) {
+		pw = "whatever";
+	}
+	return UserCreds.fromPassword(userid, pw);
+}
+
+function compareCreds(a: UserCreds, b: UserCreds): boolean {
+	return a.userID === b.userID && a.pwHash.equals(b.pwHash) && a.salt.equals(b.salt);
 }

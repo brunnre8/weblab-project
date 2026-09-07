@@ -59,6 +59,14 @@ export class UserCreds {
 	get userID(): UserID {
 		return this.#userID;
 	}
+
+	get pwHash(): Buffer {
+		return Buffer.copyBytesFrom(this.#pwHash);
+	}
+
+	get salt(): Buffer {
+		return Buffer.copyBytesFrom(this.#salt);
+	}
 }
 
 const SALT_BYTES = 16;

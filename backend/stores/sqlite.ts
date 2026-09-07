@@ -1,7 +1,7 @@
 import type { UserStore } from "../users/userStore.ts";
 import type { PathLike } from "node:fs";
-import { DatabaseSync, type DatabaseSyncOptions, type SQLOutputValue, type SQLTagStore } from "node:sqlite";
-import type { UserID, User, UserCreds } from "../users/models.ts";
+import { DatabaseSync, type DatabaseSyncOptions, type SQLTagStore } from "node:sqlite";
+import { type UserID, type User, UserCreds } from "../users/models.ts";
 import { ErrNoRows } from "./errors.ts";
 import type { TodoStore } from "../todos/todoStore.ts";
 import type { TodoID, Todo } from "../todos/models.ts";
@@ -36,7 +36,29 @@ export class SqliteStore implements UserStore, TodoStore {
 	}
 
 	async getUserCredsByEmail(email: string): Promise<UserCreds> {
-		throw new Error("Method not implemented.");
+		const val = this.#sql.get`
+			SELECT * from user_creds
+			WHERE userid in (
+				SELECT userid from users
+				where email = ${email}
+			);
+		`;
+		if (val === undefined) {
+			throw new ErrNoRows(`no creds for email ${email}`);
+		}
+		return toUserCreds(val);
+	}
+
+	async insertUserCreds(creds: UserCreds): Promise<void> {
+		const change = this.#sql.run`
+		INSERT INTO user_creds
+		(userid, pwhash, salt)
+		VALUES
+		(${creds.userID}, ${creds.pwHash}, ${creds.salt})
+		`;
+		if (change.changes != 1) {
+			throw new Error("insert failed");
+		}
 	}
 
 	async listUsers(): Promise<User[]> {
@@ -205,6 +227,10 @@ function toTodo(raw: any): Todo {
 		createdAt: fromSqDate(raw.createdAt),
 		ownerID: raw.ownerID,
 	};
+}
+
+function toUserCreds(raw: any): UserCreds {
+	return new UserCreds(raw.userid, raw.pwhash, raw.salt);
 }
 
 // init_schema is the first DB schema ever shipped.
