@@ -1,7 +1,10 @@
 import { scrypt, randomBytes, timingSafeEqual } from "node:crypto";
+import * as z from "zod";
+import { ErrBadInput } from "../helpers/conversions.ts";
 
 export type UserID = number;
-export type UserRole = "user" | "admin";
+export const userRoles = ["user", "admin"] as const;
+export type UserRole = (typeof userRoles)[number];
 
 export interface User {
 	id: UserID;
@@ -9,6 +12,25 @@ export interface User {
 	email: string;
 	role: UserRole;
 	disabled: boolean;
+}
+
+export type UserInput = Omit<User, "id">;
+
+const UserInputSchema = z.compile(
+	z.object({
+		name: z.string().trim().nonempty(),
+		email: z.string(), // could do email type, but that's regex based and ill advised
+		role: z.enum(userRoles),
+		disabled: z.boolean(),
+	}),
+);
+
+export function verifyUserInput(input: Partial<User>): UserInput {
+	const ret = UserInputSchema.safeParse(input);
+	if (!ret.success) {
+		throw new ErrBadInput("bad input for todo", { cause: ret.error });
+	}
+	return ret.data;
 }
 
 export class UserCreds {
