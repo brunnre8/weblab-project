@@ -125,7 +125,7 @@ export class SqliteStore implements UserStore, TodoStore {
 			const changes = this.#sql.run`
 				UPDATE users
 				set name = ${user.name}, email = ${user.email}, role = ${user.role}, disabled = ${bool(user.disabled)}
-				WHERE id = ${user.id}
+				WHERE id = ${user.id};
 			`;
 			if (changes.changes != 1) {
 				throw new ErrNoRows(`no user with id ${user.id}`);
@@ -135,6 +135,16 @@ export class SqliteStore implements UserStore, TodoStore {
 				throw asConstraintErr(err);
 			}
 			throw err;
+		}
+	}
+
+	async deleteUser(userID: UserID): Promise<void> {
+		const changes = this.#sql.run`
+			DELETE FROM users
+			WHERE id = ${userID};
+		`;
+		if (changes.changes != 1) {
+			throw new ErrNoRows(`no user with id ${userID}`);
 		}
 	}
 

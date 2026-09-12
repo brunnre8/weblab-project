@@ -34,6 +34,10 @@ describe("sqlite userStore", () => {
 		test("userCreds", async () => {
 			await expect(db.getUserCredsByEmail("404@example.com")).rejects.toThrow(ErrNoRows);
 		});
+
+		test("deleteUser", async () => {
+			await expect(db.deleteUser(-1)).rejects.toThrow(ErrNoRows);
+		});
 	});
 
 	describe("roundtrips", () => {
@@ -99,6 +103,19 @@ describe("sqlite userStore", () => {
 			expect(compareCreds(oldCreds, fromDb.creds)).toBe(false);
 			expect(fromDb.userID).toBe(user.id);
 			expect(compareCreds(newCreds, fromDb.creds)).toBe(true);
+		});
+
+		test("deleteUser", async () => {
+			const user = dummyUser({ role: "user" });
+			const creds = await dummyUserCreds();
+			user.id = await sqliteStore.insertUser(user, creds);
+			// we need to make sure that the propagation works, so fill up todos
+			const todo = dummyTodo({ ownerID: user.id });
+			const todoID = await sqliteStore.insertTodo(todo);
+			await expect(db.deleteUser(user.id)).resolves.toBeUndefined();
+			// cascading deletion needs to work
+			await expect(sqliteStore.getTodo(todoID)).rejects.toThrow(ErrNoRows);
+			await expect(db.getUserCredsByEmail(user.email)).rejects.toThrow(ErrNoRows);
 		});
 	});
 

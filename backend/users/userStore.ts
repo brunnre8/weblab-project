@@ -30,4 +30,7 @@ export interface UserStore {
 
 	// update user based on its primary key
 	updateUser(user: User): Promise<void>;
+
+	// delete user based on its primary key
+	deleteUser(userID: UserID): Promise<void>;
 }
