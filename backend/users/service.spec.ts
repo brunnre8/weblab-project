@@ -2,8 +2,9 @@ import { test, describe, beforeEach, afterEach, expect } from "vitest";
 import { SqliteStore } from "../stores/sqlite.ts";
 import { UserService } from "./service.ts";
 import { dummyTodo, dummyUser } from "../stores/sqlite.spec.ts";
-import { UserCreds, type User, type UserID } from "../users/models.ts";
+import { UserCreds, type User, type UserID, type UserInput } from "../users/models.ts";
 import { ErrNoEnt, ErrPerm } from "../middlewares/errors.ts";
+import { ErrBadInput } from "../helpers/conversions.ts";
 
 describe("todo service check", () => {
 	let service: UserService;
@@ -51,6 +52,37 @@ describe("todo service check", () => {
 			await expect(service.userFromLogin(user.email, pw)).resolves.toStrictEqual(user);
 			await expect(service.userFromLogin(user.email, "incorrect")).resolves.toBeNull();
 			await expect(service.userFromLogin("404@example.com", pw)).resolves.toBeNull();
+		});
+	});
+
+	describe("bad input", () => {
+		test("insertUser", async () => {
+			const pw = "whateverasdfasdfasdfasdfasdfasdf";
+			const inputs = [
+				{ role: "nope" },
+				{ role: "admin" },
+				{},
+				{ name: "", role: "admin", email: "a@example.com", disabled: true },
+				{ name: "", role: "admin", email: null, disabled: true },
+				{ name: "asdf", role: "pony", email: "a@example.com", disabled: true },
+				{ name: "asdf", role: "user", email: "a@example.com" },
+			];
+			for (const i of inputs) {
+				await expect(service.insertUser(i as UserInput, pw)).rejects.toThrow(ErrBadInput);
+			}
+		});
+
+		test("pw issues", async () => {
+			const user = dummyUser({ name: "someone", role: "user" });
+			for (const pw of [
+				"a".repeat(14),
+				"",
+				"a".repeat(14) + " ",
+				" " + "a".repeat(14),
+				"a".repeat(13) + " " + "a".repeat(4),
+				"a".repeat(13) + "\t" + "a".repeat(4),
+			])
+				await expect(service.insertUser(user, pw)).rejects.toThrow(ErrBadInput);
 		});
 	});
 });
