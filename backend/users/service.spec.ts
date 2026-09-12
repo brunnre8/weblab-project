@@ -1,9 +1,8 @@
 import { test, describe, beforeEach, afterEach, expect } from "vitest";
 import { SqliteStore } from "../stores/sqlite.ts";
 import { UserService } from "./service.ts";
-import { dummyTodo, dummyUser } from "../stores/sqlite.spec.ts";
-import { UserCreds, type User, type UserID, type UserInput } from "../users/models.ts";
-import { ErrNoEnt, ErrPerm } from "../middlewares/errors.ts";
+import { dummyUser } from "../stores/sqlite.spec.ts";
+import { UserCreds, type User, type UserInput } from "../users/models.ts";
 import { ErrBadInput } from "../helpers/conversions.ts";
 
 describe("todo service check", () => {
