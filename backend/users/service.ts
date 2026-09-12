@@ -1,5 +1,5 @@
 import { ErrBadInput } from "../helpers/conversions.ts";
-import { ErrConflict } from "../middlewares/errors.ts";
+import { ErrConflict, ErrPerm } from "../middlewares/errors.ts";
 import { ErrConstraint, ErrNoRows } from "../stores/errors.ts";
 import { UserCreds, verifyUserInput, type User, type UserID, type UserInput } from "./models.ts";
 import { type UserStore } from "./userStore.ts";
@@ -30,6 +30,25 @@ export class UserService {
 		try {
 			user.id = await this.#userStore.insertUser(user, creds);
 			return user;
+		} catch (err) {
+			if (err instanceof ErrConstraint) {
+				throw new ErrConflict("conflicting user", { cause: err });
+			}
+			throw err;
+		}
+	}
+
+	async updateUser(updateId: UserID, updates: UserInput): Promise<void> {
+		const original = await this.#userStore.getUserById(updateId);
+		const patches = verifyUserInput(updates);
+		const updated: User = {
+			...original,
+			...patches,
+			// this should be a no-op, but make sure this is never overwritten
+			id: original.id,
+		};
+		try {
+			await this.#userStore.updateUser(updated);
 		} catch (err) {
 			if (err instanceof ErrConstraint) {
 				throw new ErrConflict("conflicting user", { cause: err });

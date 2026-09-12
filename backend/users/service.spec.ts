@@ -44,6 +44,13 @@ describe("todo service check", () => {
 			await expect(service.getUser(newUser.id)).resolves.toStrictEqual(newUser);
 		});
 
+		test("updateUser", async () => {
+			const user = dummyUser({ name: "someone", role: "user" });
+			user.id = await sqliteStore.insertUser(user);
+			user.name = "someone else";
+			await expect(service.updateUser(user.id, user)).resolves.toBeUndefined();
+		});
+
 		test("userFromLogin", async () => {
 			const user = dummyUser({ name: "someone", role: "user" });
 			const pw = "ddkdeiufkfhasd;foiwdk#@!";
@@ -77,6 +84,15 @@ describe("todo service check", () => {
 			const userB = dummyUser({ name: "someone else", role: "user", email: "conflicts@example.com" });
 			await sqliteStore.insertUser(userA);
 			await expect(service.insertUser(userB, "a".repeat(15))).rejects.toThrow(ErrConflict);
+		});
+
+		test("user update conflict", async () => {
+			const userA = dummyUser({ name: "someone", role: "user", email: "conflicts@example.com" });
+			const userB = dummyUser({ name: "someone else", role: "user", email: "fine@example.com" });
+			userA.id = await sqliteStore.insertUser(userA);
+			userB.id = await sqliteStore.insertUser(userB);
+			userB.email = userA.email;
+			await expect(service.updateUser(userB.id, userB)).rejects.toThrow(ErrConflict);
 		});
 
 		test("pw issues", async () => {
