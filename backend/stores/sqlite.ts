@@ -177,7 +177,7 @@ export class SqliteStore implements UserStore, TodoStore {
 			this.#db.exec("ROLLBACK;");
 			return;
 		}
-		for (const stmt of migrations) {
+		for (const stmt of migrations.slice(dbVersion)) {
 			this.#db.exec(stmt);
 		}
 		this.setSchemaVersion(newVersion);
