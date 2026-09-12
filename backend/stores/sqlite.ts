@@ -121,13 +121,20 @@ export class SqliteStore implements UserStore, TodoStore {
 	}
 
 	async updateUser(user: User): Promise<void> {
-		const changes = this.#sql.run`
-		UPDATE users
-		set name = ${user.name}, email = ${user.email}, role = ${user.role}, disabled = ${bool(user.disabled)}
-		WHERE id = ${user.id}
-		`;
-		if (changes.changes != 1) {
-			throw new ErrNoRows(`no user with id ${user.id}`);
+		try {
+			const changes = this.#sql.run`
+				UPDATE users
+				set name = ${user.name}, email = ${user.email}, role = ${user.role}, disabled = ${bool(user.disabled)}
+				WHERE id = ${user.id}
+			`;
+			if (changes.changes != 1) {
+				throw new ErrNoRows(`no user with id ${user.id}`);
+			}
+		} catch (err) {
+			if (isConstraintErr(err)) {
+				throw asConstraintErr(err);
+			}
+			throw err;
 		}
 	}
 

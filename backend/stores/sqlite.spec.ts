@@ -109,6 +109,15 @@ describe("sqlite userStore", () => {
 			await db.insertUser(userA);
 			await expect(db.insertUser(userB)).rejects.toThrow(ErrConstraint);
 		});
+
+		test("duplicate email update disallowed", async () => {
+			const userA = dummyUser({ name: "billy", email: "one@example.com" });
+			const userB = dummyUser({ name: "marry", email: "tww@example.com" });
+			userA.id = await db.insertUser(userA);
+			userB.id = await db.insertUser(userB);
+			userB.email = userA.email;
+			await expect(db.updateUser(userB)).rejects.toThrow(ErrConstraint);
+		});
 	});
 });
 
