@@ -19,10 +19,10 @@ export class UserService {
 	}
 
 	async insertUser(input: UserInput, password: string): Promise<User> {
-		input = verifyUserInput(input);
+		const sanitized = verifyUserInput(input);
 		verifyPasswordRequirements(password);
 		const user: User = {
-			...input,
+			...sanitized,
 			id: -1, // will be overwritten momentarily
 		};
 		const creds = await UserCreds.fromPassword(password);
