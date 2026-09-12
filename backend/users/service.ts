@@ -1,5 +1,6 @@
 import { ErrBadInput } from "../helpers/conversions.ts";
-import { ErrNoRows } from "../stores/errors.ts";
+import { ErrConflict } from "../middlewares/errors.ts";
+import { ErrConstraint, ErrNoRows } from "../stores/errors.ts";
 import { UserCreds, verifyUserInput, type User, type UserID, type UserInput } from "./models.ts";
 import { type UserStore } from "./userStore.ts";
 
@@ -26,8 +27,15 @@ export class UserService {
 			id: -1, // will be overwritten momentarily
 		};
 		const creds = await UserCreds.fromPassword(password);
-		user.id = await this.#userStore.insertUser(user, creds);
-		return user;
+		try {
+			user.id = await this.#userStore.insertUser(user, creds);
+			return user;
+		} catch (err) {
+			if (err instanceof ErrConstraint) {
+				throw new ErrConflict("conflicting user", { cause: err });
+			}
+			throw err;
+		}
 	}
 
 	async userFromLogin(email: string, password: string): Promise<User | null> {

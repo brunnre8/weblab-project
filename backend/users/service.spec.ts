@@ -4,6 +4,7 @@ import { UserService } from "./service.ts";
 import { dummyUser } from "../stores/sqlite.spec.ts";
 import { UserCreds, type User, type UserInput } from "../users/models.ts";
 import { ErrBadInput } from "../helpers/conversions.ts";
+import { ErrConflict } from "../middlewares/errors.ts";
 
 describe("todo service check", () => {
 	let service: UserService;
@@ -69,6 +70,13 @@ describe("todo service check", () => {
 			for (const i of inputs) {
 				await expect(service.insertUser(i as UserInput, pw)).rejects.toThrow(ErrBadInput);
 			}
+		});
+
+		test("user insertion conflict", async () => {
+			const userA = dummyUser({ name: "someone", role: "user", email: "conflicts@example.com" });
+			const userB = dummyUser({ name: "someone else", role: "user", email: "conflicts@example.com" });
+			await sqliteStore.insertUser(userA);
+			await expect(service.insertUser(userB, "a".repeat(15))).rejects.toThrow(ErrConflict);
 		});
 
 		test("pw issues", async () => {
