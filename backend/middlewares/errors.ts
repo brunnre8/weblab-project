@@ -3,6 +3,7 @@ import { ErrBadInput } from "../helpers/conversions.ts";
 
 export class ErrPerm extends Error {}
 export class ErrNoEnt extends Error {}
+export class ErrConflict extends Error {}
 
 export function permissionErrorMw(): ErrorRequestHandler {
 	return (err, _req, res, next) => {
@@ -28,6 +29,16 @@ export function badInputErrorMw(): ErrorRequestHandler {
 	return (err, _req, res, next) => {
 		if (err instanceof ErrBadInput) {
 			res.sendStatus(400);
+			return;
+		}
+		next(err);
+	};
+}
+
+export function conflictErrorMw(): ErrorRequestHandler {
+	return (err, _req, res, next) => {
+		if (err instanceof ErrConflict) {
+			res.sendStatus(409); // conflict
 			return;
 		}
 		next(err);
