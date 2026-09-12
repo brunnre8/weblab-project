@@ -2,13 +2,17 @@ import type { UserCredsWithID, UserStore } from "../users/userStore.ts";
 import type { PathLike } from "node:fs";
 import { DatabaseSync, type DatabaseSyncOptions, type SQLTagStore } from "node:sqlite";
 import { type UserID, type User, UserCreds } from "../users/models.ts";
-import { ErrNoRows } from "./errors.ts";
+import { ErrConstraint, ErrNoRows } from "./errors.ts";
 import type { TodoStore } from "../todos/todoStore.ts";
 import type { TodoID, Todo } from "../todos/models.ts";
 
 const sqliteOptions: DatabaseSyncOptions = {
 	timeout: 5000, //ms
 };
+
+// https://sqlite.org/rescode.html
+// node shoves them into err.errcode
+const ERRCODE_SQLITE_CONSTRAINT_UNIQUE = 2067;
 
 // note: The current DB implementation is synchronous, blocking the event loop.
 // However, for small to medium sites with low volume queries we might get away
@@ -50,14 +54,21 @@ export class SqliteStore implements UserStore, TodoStore {
 	}
 
 	async insertUserCreds(userID: UserID, creds: UserCreds): Promise<void> {
-		const change = this.#sql.run`
-		INSERT INTO user_creds
-		(userid, pwhash, salt)
-		VALUES
-		(${userID}, ${creds.pwHash}, ${creds.salt})
-		`;
-		if (change.changes != 1) {
-			throw new Error("insert failed");
+		try {
+			const change = this.#sql.run`
+				INSERT INTO user_creds
+				(userid, pwhash, salt)
+				VALUES
+				(${userID}, ${creds.pwHash}, ${creds.salt})
+			`;
+			if (change.changes != 1) {
+				throw new Error("insert failed");
+			}
+		} catch (err) {
+			if (isConstraintErr(err)) {
+				throw asConstraintErr(err);
+			}
+			throw err;
 		}
 	}
 
@@ -102,6 +113,9 @@ export class SqliteStore implements UserStore, TodoStore {
 			return userID;
 		} catch (err) {
 			this.#db.exec("ROLLBACK;");
+			if (isConstraintErr(err)) {
+				throw asConstraintErr(err);
+			}
 			throw err;
 		}
 	}
@@ -289,3 +303,14 @@ const init_schema = `
 var migrations = [
 	"", // new db so full schema is applied
 ];
+
+function isConstraintErr(err: unknown): boolean {
+	if (typeof err !== "object") {
+		return false;
+	}
+	return (err as any).errcode === ERRCODE_SQLITE_CONSTRAINT_UNIQUE;
+}
+
+function asConstraintErr(err: any): Error {
+	return new ErrConstraint(err.message, { cause: err });
+}

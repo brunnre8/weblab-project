@@ -1,6 +1,6 @@
 import { test, describe, beforeEach, afterEach, expect } from "vitest";
 import { SqliteStore } from "./sqlite.ts";
-import { ErrNoRows } from "./errors.ts";
+import { ErrConstraint, ErrNoRows } from "./errors.ts";
 import { UserCreds, type User } from "../users/models.ts";
 import type { UserStore } from "../users/userStore.ts";
 import type { TodoStore } from "../todos/todoStore.ts";
@@ -107,7 +107,7 @@ describe("sqlite userStore", () => {
 			const userA = dummyUser({ name: "billy", email: "one@example.com" });
 			const userB = dummyUser({ name: "marry", email: "one@example.com" });
 			await db.insertUser(userA);
-			await expect(db.insertUser(userB)).rejects.toThrow(/email/);
+			await expect(db.insertUser(userB)).rejects.toThrow(ErrConstraint);
 		});
 	});
 });
