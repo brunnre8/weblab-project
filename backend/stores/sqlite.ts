@@ -61,6 +61,17 @@ export class SqliteStore implements UserStore, TodoStore {
 		}
 	}
 
+	async updateUserCreds(creds: UserCreds): Promise<void> {
+		const change = this.#sql.run`
+		UPDATE user_creds
+		set pwhash = ${creds.pwHash}, salt = ${creds.salt}
+		WHERE userid = ${creds.userID}
+		`;
+		if (change.changes != 1) {
+			throw new Error("update failed");
+		}
+	}
+
 	async listUsers(): Promise<User[]> {
 		return this.#sql.all`SELECT * from users order by id`.map(toUser);
 	}

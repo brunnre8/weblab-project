@@ -65,13 +65,25 @@ describe("sqlite userStore", () => {
 			expect(dbList).toStrictEqual(userList);
 		});
 
-		test("userCreds", async () => {
+		test("userCreds - insert", async () => {
 			const user = dummyUser({ role: "user" });
 			user.id = await db.insertUser(user);
 			const creds = await dummyUserCreds(user.id);
 			await db.insertUserCreds(creds);
 			const fromDb = await db.getUserCredsByEmail(user.email);
 			expect(compareCreds(creds, fromDb)).toBe(true);
+		});
+
+		test("userCreds - update", async () => {
+			const user = dummyUser({ role: "user" });
+			user.id = await db.insertUser(user);
+			const oldCreds = await dummyUserCreds(user.id);
+			await db.insertUserCreds(oldCreds);
+			const newCreds = await dummyUserCreds(user.id, "very much not the same");
+			await db.updateUserCreds(newCreds);
+			const fromDb = await db.getUserCredsByEmail(user.email);
+			expect(compareCreds(oldCreds, fromDb)).toBe(false);
+			expect(compareCreds(newCreds, fromDb)).toBe(true);
 		});
 	});
 

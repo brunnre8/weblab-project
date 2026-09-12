@@ -10,6 +10,9 @@ export interface UserStore {
 	// insert user credentials into the store
 	insertUserCreds(creds: UserCreds): Promise<void>;
 
+	// update user credentials
+	updateUserCreds(creds: UserCreds): Promise<void>;
+
 	// List all users in the store
 	listUsers(): Promise<User[]>;
 
