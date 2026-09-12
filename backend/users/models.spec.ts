@@ -3,20 +3,14 @@ import { UserCreds, verifyUserInput, type UserInput } from "./models.ts";
 import { ErrBadInput } from "../helpers/conversions.ts";
 
 describe("UserCreds", () => {
-	test("uid is correct", async () => {
-		const uid = 42;
-		const creds = await UserCreds.fromPassword(uid, "asdf");
-		expect(creds.userID).toEqual(uid);
-	});
-
 	test("verify ok", async () => {
 		const pw = "supersecret";
-		const creds = await UserCreds.fromPassword(1, pw);
+		const creds = await UserCreds.fromPassword(pw);
 		await expect(creds.validate(pw)).resolves.toBe(true);
 	});
 
 	test("verify bad", async () => {
-		const creds = await UserCreds.fromPassword(2, "greatpassword!%#$@@#$--");
+		const creds = await UserCreds.fromPassword("greatpassword!%#$@@#$--");
 		await expect(creds.validate("not ok")).resolves.toBe(false);
 	});
 });

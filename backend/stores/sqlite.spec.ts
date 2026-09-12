@@ -1,7 +1,7 @@
 import { test, describe, beforeEach, afterEach, expect } from "vitest";
 import { SqliteStore } from "./sqlite.ts";
 import { ErrNoRows } from "./errors.ts";
-import { UserCreds, type User, type UserID } from "../users/models.ts";
+import { UserCreds, type User } from "../users/models.ts";
 import type { UserStore } from "../users/userStore.ts";
 import type { TodoStore } from "../todos/todoStore.ts";
 import type { Todo } from "../todos/models.ts";
@@ -46,6 +46,19 @@ describe("sqlite userStore", () => {
 			expect(dbUser).toStrictEqual(user);
 		});
 
+		test("user insertion with creds", async () => {
+			const user = dummyUser({ role: "admin" });
+			const creds = await dummyUserCreds();
+			user.id = await db.insertUser(user, creds);
+			// we want the userid to be ignored for inserts
+			expect(user.id).not.toBe(-1);
+			const dbUser = await db.getUserById(user.id);
+			expect(dbUser).toStrictEqual(user);
+			const dbCreds = await db.getUserCredsByEmail(user.email);
+			expect(dbCreds.userID).toBe(user.id);
+			expect(compareCreds(creds, dbCreds.creds)).toBe(true);
+		});
+
 		test("updateUser", async () => {
 			const user = dummyUser({ role: "admin" });
 			user.id = await db.insertUser(user);
@@ -68,22 +81,24 @@ describe("sqlite userStore", () => {
 		test("userCreds - insert", async () => {
 			const user = dummyUser({ role: "user" });
 			user.id = await db.insertUser(user);
-			const creds = await dummyUserCreds(user.id);
-			await db.insertUserCreds(creds);
+			const creds = await dummyUserCreds();
+			await db.insertUserCreds(user.id, creds);
 			const fromDb = await db.getUserCredsByEmail(user.email);
-			expect(compareCreds(creds, fromDb)).toBe(true);
+			expect(fromDb.userID).toBe(user.id);
+			expect(compareCreds(creds, fromDb.creds)).toBe(true);
 		});
 
 		test("userCreds - update", async () => {
 			const user = dummyUser({ role: "user" });
 			user.id = await db.insertUser(user);
-			const oldCreds = await dummyUserCreds(user.id);
-			await db.insertUserCreds(oldCreds);
-			const newCreds = await dummyUserCreds(user.id, "very much not the same");
-			await db.updateUserCreds(newCreds);
+			const oldCreds = await dummyUserCreds();
+			await db.insertUserCreds(user.id, oldCreds);
+			const newCreds = await dummyUserCreds("very much not the same");
+			await db.updateUserCreds(user.id, newCreds);
 			const fromDb = await db.getUserCredsByEmail(user.email);
-			expect(compareCreds(oldCreds, fromDb)).toBe(false);
-			expect(compareCreds(newCreds, fromDb)).toBe(true);
+			expect(compareCreds(oldCreds, fromDb.creds)).toBe(false);
+			expect(fromDb.userID).toBe(user.id);
+			expect(compareCreds(newCreds, fromDb.creds)).toBe(true);
 		});
 	});
 
@@ -213,16 +228,13 @@ export function dummyTodo(props?: Partial<Todo>): Todo {
 	};
 }
 
-async function dummyUserCreds(userid?: UserID, pw?: string) {
-	if (userid === undefined) {
-		userid = 1;
-	}
+async function dummyUserCreds(pw?: string) {
 	if (pw === undefined) {
 		pw = "whatever";
 	}
-	return UserCreds.fromPassword(userid, pw);
+	return UserCreds.fromPassword(pw);
 }
 
 function compareCreds(a: UserCreds, b: UserCreds): boolean {
-	return a.userID === b.userID && a.pwHash.equals(b.pwHash) && a.salt.equals(b.salt);
+	return a.pwHash.equals(b.pwHash) && a.salt.equals(b.salt);
 }

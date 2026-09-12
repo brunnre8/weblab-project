@@ -34,30 +34,24 @@ export function verifyUserInput(input: Partial<User>): UserInput {
 }
 
 export class UserCreds {
-	#userID: UserID;
 	#pwHash: Buffer;
 	#salt: Buffer;
 
-	constructor(userID: UserID, pwHash: Buffer, salt: Buffer) {
-		this.#userID = userID;
+	constructor(pwHash: Buffer, salt: Buffer) {
 		this.#pwHash = pwHash;
 		this.#salt = salt;
 	}
 
-	static async fromPassword(userID: UserID, password: string): Promise<UserCreds> {
+	static async fromPassword(password: string): Promise<UserCreds> {
 		const salt = await genSalt();
 		const hash = await hashPassword(password, salt);
-		return new UserCreds(userID, hash, salt);
+		return new UserCreds(hash, salt);
 	}
 
 	async validate(password: string): Promise<boolean> {
 		const otherPw = normalizePw(password);
 		const otherHash = await hashPassword(otherPw, this.#salt);
 		return timingSafeEqual(this.#pwHash, otherHash);
-	}
-
-	get userID(): UserID {
-		return this.#userID;
 	}
 
 	get pwHash(): Buffer {

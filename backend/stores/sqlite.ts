@@ -1,4 +1,4 @@
-import type { UserStore } from "../users/userStore.ts";
+import type { UserCredsWithID, UserStore } from "../users/userStore.ts";
 import type { PathLike } from "node:fs";
 import { DatabaseSync, type DatabaseSyncOptions, type SQLTagStore } from "node:sqlite";
 import { type UserID, type User, UserCreds } from "../users/models.ts";
@@ -35,7 +35,7 @@ export class SqliteStore implements UserStore, TodoStore {
 		return toUser(val);
 	}
 
-	async getUserCredsByEmail(email: string): Promise<UserCreds> {
+	async getUserCredsByEmail(email: string): Promise<UserCredsWithID> {
 		const val = this.#sql.get`
 			SELECT * from user_creds
 			WHERE userid in (
@@ -49,23 +49,23 @@ export class SqliteStore implements UserStore, TodoStore {
 		return toUserCreds(val);
 	}
 
-	async insertUserCreds(creds: UserCreds): Promise<void> {
+	async insertUserCreds(userID: UserID, creds: UserCreds): Promise<void> {
 		const change = this.#sql.run`
 		INSERT INTO user_creds
 		(userid, pwhash, salt)
 		VALUES
-		(${creds.userID}, ${creds.pwHash}, ${creds.salt})
+		(${userID}, ${creds.pwHash}, ${creds.salt})
 		`;
 		if (change.changes != 1) {
 			throw new Error("insert failed");
 		}
 	}
 
-	async updateUserCreds(creds: UserCreds): Promise<void> {
+	async updateUserCreds(userID: UserID, creds: UserCreds): Promise<void> {
 		const change = this.#sql.run`
 		UPDATE user_creds
 		set pwhash = ${creds.pwHash}, salt = ${creds.salt}
-		WHERE userid = ${creds.userID}
+		WHERE userid = ${userID}
 		`;
 		if (change.changes != 1) {
 			throw new Error("update failed");
@@ -81,18 +81,29 @@ export class SqliteStore implements UserStore, TodoStore {
 		return row !== undefined;
 	}
 
-	async insertUser(user: User): Promise<UserID> {
-		const row = this.#sql.get`
-		INSERT INTO users
-		(name, email, role, disabled)
-		VALUES
-		(${user.name}, ${user.email}, ${user.role}, ${bool(user.disabled)})
-		returning id;
-		`;
-		if (row == undefined) {
-			throw new Error("didn't get uid back from insert");
+	async insertUser(user: User, creds?: UserCreds): Promise<UserID> {
+		this.#db.exec("BEGIN TRANSACTION;");
+		try {
+			const row = this.#sql.get`
+				INSERT INTO users
+				(name, email, role, disabled)
+				VALUES
+				(${user.name}, ${user.email}, ${user.role}, ${bool(user.disabled)})
+				returning id;
+				`;
+			if (row == undefined) {
+				throw new Error("didn't get uid back from insert");
+			}
+			const userID = row.id as UserID;
+			if (creds !== undefined) {
+				await this.insertUserCreds(userID, creds);
+			}
+			this.#db.exec("COMMIT;");
+			return userID;
+		} catch (err) {
+			this.#db.exec("ROLLBACK;");
+			throw err;
 		}
-		return row.id as UserID;
 	}
 
 	async updateUser(user: User): Promise<void> {
@@ -240,8 +251,12 @@ function toTodo(raw: any): Todo {
 	};
 }
 
-function toUserCreds(raw: any): UserCreds {
-	return new UserCreds(raw.userid, raw.pwhash, raw.salt);
+function toUserCreds(raw: any): UserCredsWithID {
+	const creds = new UserCreds(raw.pwhash, raw.salt);
+	return {
+		creds: creds,
+		userID: raw.userid,
+	};
 }
 
 // init_schema is the first DB schema ever shipped.
