@@ -165,13 +165,13 @@ export class SqliteStore implements UserStore, TodoStore {
 		this.migrateVersion(migrations.length);
 	}
 
-	migrateVersion(length: number) {
+	migrateVersion(newVersion: number) {
 		this.#db.exec("BEGIN EXCLUSIVE TRANSACTION;");
 		const dbVersion = this.getSchemaVersion();
 		if (dbVersion === 0) {
 			this.#db.exec(init_schema);
-		} else if (dbVersion > migrations.length) {
-			throw new Error(`db version ${dbVersion} newer than us (${migrations.length}). Refusing to operate`);
+		} else if (dbVersion > newVersion) {
+			throw new Error(`db version ${dbVersion} newer than us (${newVersion}). Refusing to operate`);
 		} else {
 			// up to date
 			this.#db.exec("ROLLBACK;");
@@ -180,7 +180,7 @@ export class SqliteStore implements UserStore, TodoStore {
 		for (const stmt of migrations) {
 			this.#db.exec(stmt);
 		}
-		this.setSchemaVersion(migrations.length);
+		this.setSchemaVersion(newVersion);
 		this.#db.exec("COMMIT;");
 	}
 
