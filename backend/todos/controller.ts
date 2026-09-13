@@ -8,8 +8,8 @@ export class TodoController {
 	#todoService: TodoService;
 	#router: Router;
 
-	constructor(todoStore: TodoService) {
-		this.#todoService = todoStore;
+	constructor(todoService: TodoService) {
+		this.#todoService = todoService;
 		this.#router = express.Router();
 		this.registerRoutes();
 	}
