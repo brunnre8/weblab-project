@@ -13,12 +13,14 @@ import type { TodoStore } from "./todos/todoStore.ts";
 import type { UserStore } from "./users/userStore.ts";
 import { UserController } from "./users/controller.ts";
 import { UserService } from "./users/service.ts";
+import { csrfMw } from "./middlewares/csrf.ts";
 
 export function createExpressApp(store: TodoStore & UserStore): Express {
 	const app = express();
 	app.disable("x-powered-by");
 
 	const apiRouter = express.Router();
+	apiRouter.use(csrfMw());
 	apiRouter.use(authMw());
 	apiRouter.use("/todos", new TodoController(new TodoService(store)).router());
 	apiRouter.use("/users", adminOnlyMw(), new UserController(new UserService(store)).router());

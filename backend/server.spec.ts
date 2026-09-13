@@ -1,6 +1,6 @@
 import { test, describe, beforeEach, afterEach, expect } from "vitest";
 import { type Express } from "express";
-import request, { type SuperTestStatic } from "supertest";
+import supertest, { type Agent, type SuperTestStatic } from "supertest";
 
 import { createExpressApp } from "./express_setup.ts";
 import { SqliteStore } from "./stores/sqlite.ts";
@@ -11,7 +11,7 @@ import type { Todo, TodoInput } from "./todos/models.ts";
 describe("server integration test", () => {
 	let app: Express;
 	let store: SqliteStore;
-	let req: ReturnType<SuperTestStatic>;
+	let agent: Agent;
 
 	let admin: User;
 	let billy: User;
@@ -21,7 +21,8 @@ describe("server integration test", () => {
 		store = new SqliteStore(":memory:");
 		[admin, billy, maria] = await populateDummy(store);
 		app = createExpressApp(store);
-		req = request(app);
+		agent = supertest.agent(app);
+		agent.set("sec-fetch-site", "same-origin");
 	});
 
 	afterEach(() => {
@@ -30,18 +31,18 @@ describe("server integration test", () => {
 
 	describe("user controller", () => {
 		test("get /api/users/", async () => {
-			const response = await req.get("/api/users/");
+			const response = await agent.get("/api/users/");
 			expect(response.status).toBe(200);
 			expect(response.headers["content-type"]).toMatch(/^application\/json;/);
 			expect(response.body).toMatchObject([admin, billy, maria]);
 		});
 
 		test("delete /api/todos/:id", async () => {
-			let response = await req.delete(`/api/users/${billy.id}`);
+			let response = await agent.delete(`/api/users/${billy.id}`);
 			expect(response.status).toBe(200);
 
 			// check that it did the trick
-			response = await req.get("/api/users/");
+			response = await agent.get("/api/users/");
 			expect(response.status).toBe(200);
 			expect(response.headers["content-type"]).toMatch(/^application\/json;/);
 			expect(response.body).toMatchObject([admin, maria]);
@@ -50,18 +51,18 @@ describe("server integration test", () => {
 		test("put /api/users/:id", async () => {
 			// setup
 			const newBilly = { ...billy };
-			let response = await req.get("/api/users/");
+			let response = await agent.get("/api/users/");
 			const expectedName = "No longer Billy";
 			const expectedRole = "admin";
 			newBilly.name = expectedName;
 			newBilly.role = expectedRole;
 
 			// execute
-			response = await req.put(`/api/users/${billy.id}`).send(newBilly);
+			response = await agent.put(`/api/users/${billy.id}`).send(newBilly);
 			expect(response.status).toBe(200);
 
 			// validate
-			const resp = await req.get("/api/users/");
+			const resp = await agent.get("/api/users/");
 			expect(response.status).toBe(200);
 			const updated = resp.body.filter((u: User) => u.id === billy.id)[0];
 			expect(updated).toEqual(newBilly);
@@ -73,14 +74,14 @@ describe("server integration test", () => {
 			delete (eva as any)["id"];
 
 			// execute
-			let response = await req.post("/api/users/new").send({
+			let response = await agent.post("/api/users/new").send({
 				user: eva,
 				password: "a".repeat(15),
 			});
 			expect(response.status).toBe(201);
 
 			// validate
-			response = await req.get("/api/users/");
+			response = await agent.get("/api/users/");
 			expect(response.status).toBe(200);
 			expect(response.body).toMatchObject([admin, billy, maria, eva]);
 		});
@@ -88,7 +89,7 @@ describe("server integration test", () => {
 
 	describe("todo controller", () => {
 		test("get /api/todos/", async () => {
-			const response = await req.get("/api/todos/");
+			const response = await agent.get("/api/todos/");
 			expect(response.status).toBe(200);
 			expect(response.headers["content-type"]).toMatch(/^application\/json;/);
 			expect(response.body).toHaveLength(1);
@@ -96,11 +97,11 @@ describe("server integration test", () => {
 		});
 
 		test("delete /api/todos/:id", async () => {
-			let response = await req.delete("/api/todos/1");
+			let response = await agent.delete("/api/todos/1");
 			expect(response.status).toBe(200);
 
 			// check that it did the trick
-			response = await req.get("/api/todos/");
+			response = await agent.get("/api/todos/");
 			expect(response.status).toBe(200);
 			expect(response.headers["content-type"]).toMatch(/^application\/json;/);
 			expect(response.body).toHaveLength(0);
@@ -108,17 +109,17 @@ describe("server integration test", () => {
 
 		test("put /api/todos/:id", async () => {
 			// setup
-			let response = await req.get("/api/todos/");
+			let response = await agent.get("/api/todos/");
 			const todo: Todo = response.body[0];
 			const expectedTitle = "new title";
 			todo.title = expectedTitle;
 
 			// execute
-			response = await req.put(`/api/todos/${todo.id}`).send(todo);
+			response = await agent.put(`/api/todos/${todo.id}`).send(todo);
 			expect(response.status).toBe(200);
 
 			// validate
-			response = await req.get("/api/todos/");
+			response = await agent.get("/api/todos/");
 			expect(response.status).toBe(200);
 			expect(response.body[0].title).toBe(expectedTitle);
 		});
@@ -129,11 +130,11 @@ describe("server integration test", () => {
 			delete (todo as any).id;
 
 			// execute
-			let response = await req.post(`/api/todos/new`).send(todo);
+			let response = await agent.post(`/api/todos/new`).send(todo);
 			expect(response.status).toBe(201);
 
 			// validate
-			response = await req.get("/api/todos/");
+			response = await agent.get("/api/todos/");
 			expect(response.status).toBe(200);
 			expect(response.body).toHaveLength(2);
 			const filtered = response.body.filter((a: Todo) => a.title === todo.title);
@@ -149,23 +150,23 @@ describe("server integration test", () => {
 
 	describe("404 errors", () => {
 		test("get todos", async () => {
-			const resp = await req.get("/api/todos/-1");
+			const resp = await agent.get("/api/todos/-1");
 			expect(resp.status).toBe(404);
 		});
 		test("delete todos", async () => {
-			const resp = await req.delete("/api/todos/-1");
+			const resp = await agent.delete("/api/todos/-1");
 			expect(resp.status).toBe(404);
 		});
 		test("update todos", async () => {
-			const resp = await req.put("/api/todos/-1").send(dummyTodo());
+			const resp = await agent.put("/api/todos/-1").send(dummyTodo());
 			expect(resp.status).toBe(404);
 		});
 		test("update user", async () => {
-			const resp = await req.put("/api/users/-1").send(dummyUser());
+			const resp = await agent.put("/api/users/-1").send(dummyUser());
 			expect(resp.status).toBe(404);
 		});
 		test("delete user", async () => {
-			const resp = await req.delete("/api/users/-1");
+			const resp = await agent.delete("/api/users/-1");
 			expect(resp.status).toBe(404);
 		});
 	});
