@@ -1,5 +1,6 @@
 import { type RequestHandler, type Request } from "express";
 import { type User } from "../users/models.ts";
+import { ErrPerm } from "./errors.ts";
 
 // note: this isn't remotely pretty, but my TS foo is not good enough to pipe the request var
 // through the RequestHandler type mess... so we forcefully mush it in.
@@ -10,6 +11,17 @@ export function authMw(): RequestHandler {
 	return (req: any, _res, next) => {
 		//TODO: actually implement this
 		req.user = dummyAdminUser();
+		next();
+	};
+}
+
+// only allows admins
+export function adminOnlyMw(): RequestHandler {
+	return (req: any, _res, next) => {
+		const user = userFromRequest(req);
+		if (user.role !== "admin") {
+			throw new ErrPerm("permission denied for non admin users");
+		}
 		next();
 	};
 }
