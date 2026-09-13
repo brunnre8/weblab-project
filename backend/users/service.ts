@@ -1,5 +1,5 @@
 import { ErrBadInput } from "../helpers/conversions.ts";
-import { ErrConflict, ErrPerm } from "../middlewares/errors.ts";
+import { ErrConflict, ErrNoEnt } from "../middlewares/errors.ts";
 import { ErrConstraint, ErrNoRows } from "../stores/errors.ts";
 import { UserCreds, verifyUserInput, type User, type UserID, type UserInput } from "./models.ts";
 import { type UserStore } from "./userStore.ts";
@@ -16,7 +16,15 @@ export class UserService {
 	}
 
 	async getUser(userID: UserID): Promise<User> {
-		return this.#userStore.getUserById(userID);
+		try {
+			const user = await this.#userStore.getUserById(userID);
+			return user;
+		} catch (err) {
+			if (err instanceof ErrNoRows) {
+				throw new ErrNoEnt("no such user", { cause: err });
+			}
+			throw err;
+		}
 	}
 
 	async insertUser(input: UserInput, password: string): Promise<User> {
@@ -38,18 +46,33 @@ export class UserService {
 		}
 	}
 
-	async updateUser(updateId: UserID, updates: UserInput): Promise<void> {
-		const original = await this.#userStore.getUserById(updateId);
-		const patches = verifyUserInput(updates);
-		const updated: User = {
-			...original,
-			...patches,
-			// this should be a no-op, but make sure this is never overwritten
-			id: original.id,
-		};
+	async deleteUser(userID: UserID): Promise<void> {
 		try {
+			const user = await this.#userStore.deleteUser(userID);
+			return user;
+		} catch (err) {
+			if (err instanceof ErrNoRows) {
+				throw new ErrNoEnt("no such user", { cause: err });
+			}
+			throw err;
+		}
+	}
+
+	async updateUser(updateId: UserID, updates: UserInput): Promise<void> {
+		try {
+			const original = await this.#userStore.getUserById(updateId);
+			const patches = verifyUserInput(updates);
+			const updated: User = {
+				...original,
+				...patches,
+				// this should be a no-op, but make sure this is never overwritten
+				id: original.id,
+			};
 			await this.#userStore.updateUser(updated);
 		} catch (err) {
+			if (err instanceof ErrNoRows) {
+				throw new ErrNoEnt("no such user", { cause: err });
+			}
 			if (err instanceof ErrConstraint) {
 				throw new ErrConflict("conflicting user", { cause: err });
 			}

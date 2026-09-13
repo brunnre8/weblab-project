@@ -4,7 +4,7 @@ import { UserService } from "./service.ts";
 import { dummyUser } from "../stores/sqlite.spec.ts";
 import { UserCreds, type User, type UserInput } from "../users/models.ts";
 import { ErrBadInput } from "../helpers/conversions.ts";
-import { ErrConflict } from "../middlewares/errors.ts";
+import { ErrConflict, ErrNoEnt } from "../middlewares/errors.ts";
 
 describe("todo service check", () => {
 	let service: UserService;
@@ -59,6 +59,20 @@ describe("todo service check", () => {
 			await expect(service.userFromLogin(user.email, pw)).resolves.toStrictEqual(user);
 			await expect(service.userFromLogin(user.email, "incorrect")).resolves.toBeNull();
 			await expect(service.userFromLogin("404@example.com", pw)).resolves.toBeNull();
+		});
+	});
+
+	describe("404s", () => {
+		test("getUser", async () => {
+			await expect(service.getUser(-1)).rejects.toThrow(ErrNoEnt);
+		});
+
+		test("deleteUser", async () => {
+			await expect(service.deleteUser(-1)).rejects.toThrow(ErrNoEnt);
+		});
+
+		test("updateUser", async () => {
+			await expect(service.updateUser(-1, dummyUser())).rejects.toThrow(ErrNoEnt);
 		});
 	});
 
