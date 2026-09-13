@@ -11,3 +11,10 @@ export function safeInt(raw: string): number {
 	}
 	return val;
 }
+
+export function mustString(raw: unknown): string {
+	if (typeof raw !== "string") {
+		throw new ErrBadInput(`expected a string got ${typeof raw}`);
+	}
+	return raw;
+}
