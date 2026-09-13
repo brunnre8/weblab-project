@@ -145,6 +145,8 @@ describe("server integration test", () => {
 		});
 	});
 
+	//TODO: permission tests once login is possible
+
 	describe("404 errors", () => {
 		test("get todos", async () => {
 			const resp = await req.get("/api/todos/-1");
