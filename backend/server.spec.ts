@@ -3,7 +3,6 @@ import { type Express } from "express";
 import request, { type SuperTestStatic } from "supertest";
 
 import { createExpressApp } from "./express_setup.ts";
-import { dummyAdminUser } from "./middlewares/auth.ts";
 import { SqliteStore } from "./stores/sqlite.ts";
 import type { User } from "./users/models.ts";
 import { dummyTodo, dummyUser } from "./stores/sqlite.spec.ts";
@@ -23,10 +22,6 @@ describe("server integration test", () => {
 		[admin, billy, maria] = await populateDummy(store);
 		app = createExpressApp(store);
 		req = request(app);
-
-		if (!(await store.hasUsers())) {
-			await store.insertUser(dummyAdminUser());
-		}
 	});
 
 	afterEach(() => {
