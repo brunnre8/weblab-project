@@ -158,6 +158,14 @@ describe("server integration test", () => {
 			const resp = await req.put("/api/todos/-1").send(dummyTodo());
 			expect(resp.status).toBe(404);
 		});
+		test("update user", async () => {
+			const resp = await req.put("/api/users/-1").send(dummyUser());
+			expect(resp.status).toBe(404);
+		});
+		test("delete user", async () => {
+			const resp = await req.delete("/api/users/-1");
+			expect(resp.status).toBe(404);
+		});
 	});
 });
 
