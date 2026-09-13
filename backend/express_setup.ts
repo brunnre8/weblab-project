@@ -1,5 +1,5 @@
 import express, { type Express } from "express";
-import { authMw } from "./middlewares/auth.ts";
+import { adminOnlyMw, authMw } from "./middlewares/auth.ts";
 import {
 	permissionErrorMw,
 	noEntityErrorMw,
@@ -11,6 +11,8 @@ import { TodoController } from "./todos/controller.ts";
 import { TodoService } from "./todos/service.ts";
 import type { TodoStore } from "./todos/todoStore.ts";
 import type { UserStore } from "./users/userStore.ts";
+import { UserController } from "./users/controller.ts";
+import { UserService } from "./users/service.ts";
 
 export function createExpressApp(store: TodoStore & UserStore): Express {
 	const app = express();
@@ -19,6 +21,7 @@ export function createExpressApp(store: TodoStore & UserStore): Express {
 	const apiRouter = express.Router();
 	apiRouter.use(authMw());
 	apiRouter.use("/todos", new TodoController(new TodoService(store)).router());
+	apiRouter.use("/users", adminOnlyMw(), new UserController(new UserService(store)).router());
 
 	app.use("/api", apiRouter);
 

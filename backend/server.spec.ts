@@ -28,6 +28,64 @@ describe("server integration test", () => {
 		store.close();
 	});
 
+	describe("user controller", () => {
+		test("get /api/users/", async () => {
+			const response = await req.get("/api/users/");
+			expect(response.status).toBe(200);
+			expect(response.headers["content-type"]).toMatch(/^application\/json;/);
+			expect(response.body).toMatchObject([admin, billy, maria]);
+		});
+
+		test("delete /api/todos/:id", async () => {
+			let response = await req.delete(`/api/users/${billy.id}`);
+			expect(response.status).toBe(200);
+
+			// check that it did the trick
+			response = await req.get("/api/users/");
+			expect(response.status).toBe(200);
+			expect(response.headers["content-type"]).toMatch(/^application\/json;/);
+			expect(response.body).toMatchObject([admin, maria]);
+		});
+
+		test("put /api/users/:id", async () => {
+			// setup
+			const newBilly = { ...billy };
+			let response = await req.get("/api/users/");
+			const expectedName = "No longer Billy";
+			const expectedRole = "admin";
+			newBilly.name = expectedName;
+			newBilly.role = expectedRole;
+
+			// execute
+			response = await req.put(`/api/users/${billy.id}`).send(newBilly);
+			expect(response.status).toBe(200);
+
+			// validate
+			const resp = await req.get("/api/users/");
+			expect(response.status).toBe(200);
+			const updated = resp.body.filter((u: User) => u.id === billy.id)[0];
+			expect(updated).toEqual(newBilly);
+		});
+
+		test("post /api/users/new", async () => {
+			// setup
+			const eva = dummyUser({ name: "eva", role: "admin", disabled: true });
+			delete (eva as any)["id"];
+
+			// execute
+			let response = await req.post("/api/users/new").send({
+				user: eva,
+				password: "a".repeat(15),
+			});
+			expect(response.status).toBe(201);
+
+			// validate
+			response = await req.get("/api/users/");
+			expect(response.status).toBe(200);
+			expect(response.body).toMatchObject([admin, billy, maria, eva]);
+		});
+	});
+
 	describe("todo controller", () => {
 		test("get /api/todos/", async () => {
 			const response = await req.get("/api/todos/");
