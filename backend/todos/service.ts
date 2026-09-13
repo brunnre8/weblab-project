@@ -26,7 +26,7 @@ export class TodoService {
 	}
 
 	async updateTodo(updateId: TodoID, updates: TodoInput, requestor: User): Promise<void> {
-		const original = await this.#todoStore.getTodo(updateId);
+		const original = await this.getTodo(updateId, requestor);
 		if (!canWrite(original, requestor)) {
 			throw new ErrPerm(`requestor: ${requestor.id} tried to write todo owned by ${original.ownerID}`);
 		}
@@ -41,7 +41,7 @@ export class TodoService {
 	}
 
 	async deleteTodo(todoID: TodoID, requestor: User): Promise<void> {
-		const target = await this.#todoStore.getTodo(todoID);
+		const target = await this.getTodo(todoID, requestor);
 		if (!canWrite(target, requestor)) {
 			throw new ErrPerm(`requestor: ${requestor.id} tried to delete todo owned by ${target.ownerID}`);
 		}

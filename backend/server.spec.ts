@@ -144,6 +144,21 @@ describe("server integration test", () => {
 			expect(received).toMatchObject(todo);
 		});
 	});
+
+	describe("404 errors", () => {
+		test("get todos", async () => {
+			const resp = await req.get("/api/todos/-1");
+			expect(resp.status).toBe(404);
+		});
+		test("delete todos", async () => {
+			const resp = await req.delete("/api/todos/-1");
+			expect(resp.status).toBe(404);
+		});
+		test("update todos", async () => {
+			const resp = await req.put("/api/todos/-1").send(dummyTodo());
+			expect(resp.status).toBe(404);
+		});
+	});
 });
 
 async function populateDummy(db: SqliteStore): Promise<[User, User, User]> {
