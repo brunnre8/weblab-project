@@ -15,16 +15,18 @@ import type { UserStore } from "./users/userStore.ts";
 export function createExpressApp(store: TodoStore & UserStore): Express {
 	const app = express();
 	app.disable("x-powered-by");
-	app.use(permissionErrorMw());
-	app.use(noEntityErrorMw());
-	app.use(badInputErrorMw());
-	app.use(conflictErrorMw());
-	app.use(internalErrorMw()); // keep this last
 
 	const apiRouter = express.Router();
 	apiRouter.use(authMw());
 	apiRouter.use("/todos", new TodoController(new TodoService(store)).router());
 
 	app.use("/api", apiRouter);
+
+	// error handlers need to be after all routes are registered
+	app.use(permissionErrorMw());
+	app.use(noEntityErrorMw());
+	app.use(badInputErrorMw());
+	app.use(conflictErrorMw());
+	app.use(internalErrorMw()); // keep this last
 	return app;
 }
