@@ -1,10 +1,11 @@
 import { test, describe, beforeEach, afterEach, expect } from "vitest";
 import { SqliteStore } from "./sqlite.ts";
 import { ErrConstraint, ErrNoRows } from "./errors.ts";
-import { UserCreds, type User } from "../users/models.ts";
+import { UserCreds, type User, type UserID } from "../users/models.ts";
 import type { UserStore } from "../users/userStore.ts";
 import type { TodoStore } from "../todos/todoStore.ts";
 import type { Todo } from "../todos/models.ts";
+import type { AuthToken, AuthTokenStore } from "../auth/tokenStore.ts";
 
 describe("sqlite userStore", () => {
 	let db: UserStore;
@@ -228,6 +229,57 @@ describe("sqlite todoStore", () => {
 			await expect(db.insertTodo(todo)).rejects.toThrow(/constraint failed/);
 		});
 	});
+});
+
+describe("sqlite tokenStore", () => {
+	let db: AuthTokenStore;
+	let sqliteStore: SqliteStore;
+	let adminID: UserID;
+
+	beforeEach(async () => {
+		db = sqliteStore = new SqliteStore(":memory:");
+		adminID = await sqliteStore.insertUser(dummyUser({ role: "admin" }));
+	});
+
+	afterEach(() => {
+		sqliteStore.close();
+	});
+
+	describe("404s", () => {
+		test("get", async () => {
+			const token = dummyToken();
+			await expect(db.getAuthToken(token.token)).rejects.toThrow(ErrNoRows);
+		});
+
+		test("deletion", async () => {
+			const token = dummyToken();
+			await expect(db.deleteAuthToken(token.token)).rejects.toThrow(ErrNoRows);
+		});
+	});
+
+	describe("roundtrips", () => {
+		test("getTodo", async () => {
+			const token = dummyToken();
+			await db.addAuthToken(token);
+			await expect(db.getAuthToken(token.token)).resolves.toStrictEqual(token);
+		});
+
+		test("deletion", async () => {
+			const token = dummyToken();
+			await db.addAuthToken(token);
+			await db.deleteAuthToken(token.token);
+			await expect(db.getAuthToken(token.token)).rejects.toThrow(ErrNoRows);
+		});
+	});
+
+	function dummyToken(props?: Partial<AuthToken>): AuthToken {
+		return {
+			userID: adminID,
+			token: "abc".repeat(10),
+			createdAt: new Date(),
+			...props,
+		};
+	}
 });
 
 export function dummyUser(props?: Partial<User>): User {

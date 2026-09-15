@@ -5,6 +5,7 @@ import { type UserID, type User, UserCreds } from "../users/models.ts";
 import { ErrConstraint, ErrNoRows } from "./errors.ts";
 import type { TodoStore } from "../todos/todoStore.ts";
 import type { TodoID, Todo } from "../todos/models.ts";
+import type { AuthToken, AuthTokenStore, AuthTokenString } from "../auth/tokenStore.ts";
 
 const sqliteOptions: DatabaseSyncOptions = {
 	timeout: 5000, //ms
@@ -20,7 +21,7 @@ const ERRCODE_SQLITE_CONSTRAINT_UNIQUE = 2067;
 // https://github.com/WiseLibs/better-sqlite3/blob/HEAD/docs/threads.md
 // node.js is working on an async variant, as soon as that's available we can migrate
 // this.
-export class SqliteStore implements UserStore, TodoStore {
+export class SqliteStore implements UserStore, TodoStore, AuthTokenStore {
 	#db: DatabaseSync;
 	#sql: SQLTagStore;
 
@@ -146,6 +147,43 @@ export class SqliteStore implements UserStore, TodoStore {
 		if (changes.changes != 1) {
 			throw new ErrNoRows(`no user with id ${userID}`);
 		}
+	}
+
+	async addAuthToken(token: AuthToken): Promise<void> {
+		try {
+			const change = this.#sql.run`
+				INSERT INTO auth_tokens
+				(userid, token, createdAt)
+				VALUES
+				(${token.userID}, ${token.token}, ${sqDate(token.createdAt)})
+			`;
+			if (change.changes != 1) {
+				throw new Error("insert failed");
+			}
+		} catch (err) {
+			if (isConstraintErr(err)) {
+				throw asConstraintErr(err);
+			}
+			throw err;
+		}
+	}
+
+	async deleteAuthToken(token: AuthTokenString): Promise<void> {
+		const changes = this.#sql.run`
+			DELETE FROM auth_tokens
+			WHERE token = ${token};
+		`;
+		if (changes.changes != 1) {
+			throw new ErrNoRows(`no token with val ${token}`);
+		}
+	}
+
+	async getAuthToken(token: AuthTokenString): Promise<AuthToken> {
+		const val = this.#sql.get`SELECT * from auth_tokens WHERE token = ${token}`;
+		if (val === undefined) {
+			throw new ErrNoRows(`no auth token with ${token}`);
+		}
+		return toAuthToken(val);
 	}
 
 	async getTodo(id: TodoID): Promise<Todo> {
@@ -290,6 +328,14 @@ function toUserCreds(raw: any): UserCredsWithID {
 	};
 }
 
+function toAuthToken(raw: any): AuthToken {
+	return {
+		userID: raw.userid,
+		token: raw.token,
+		createdAt: fromSqDate(raw.createdAt),
+	};
+}
+
 // init_schema is the first DB schema ever shipped.
 // Never change this, add migrations instead
 const init_schema = `
@@ -314,6 +360,13 @@ const init_schema = `
 		userid INTEGER UNIQUE NOT NULL REFERENCES users ON DELETE CASCADE,
 		pwhash BLOB NOT NULL,
 		salt BLOB NOT NULL
+	);
+
+	CREATE TABLE auth_tokens (
+		id INTEGER PRIMARY KEY,
+		userid INTEGER UNIQUE NOT NULL REFERENCES users ON DELETE CASCADE,
+		token TEXT UNIQUE NOT NULL,
+		createdAt DATETIME NOT NULL
 	);
 `;
 
