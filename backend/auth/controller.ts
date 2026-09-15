@@ -44,6 +44,9 @@ export class AuthController {
 				throw new ErrBadInput("logout with no token");
 			}
 			await this.#authService.logout(token);
+			res.clearCookie(this.#authCookieName, {
+				...authCookieTemplate,
+			});
 		});
 	}
 
