@@ -34,6 +34,17 @@ export class AuthController {
 				expires: nowInMonths(1),
 			});
 		});
+
+		this.#router.post("/logout", async (req, res) => {
+			if (!req.body) {
+				throw new ErrBadInput("expected json body");
+			}
+			const token = req.cookies[this.#authCookieName];
+			if (!token) {
+				throw new ErrBadInput("logout with no token");
+			}
+			await this.#authService.logout(token);
+		});
 	}
 
 	router(): Router {
