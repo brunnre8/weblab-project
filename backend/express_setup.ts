@@ -15,19 +15,25 @@ import { UserController } from "./users/controller.ts";
 import { UserService } from "./users/service.ts";
 import { csrfMw } from "./middlewares/csrf.ts";
 import cookieParser from "cookie-parser";
+import { AuthController } from "./auth/controller.ts";
+import { AuthService } from "./auth/service.ts";
+import type { AuthTokenStore } from "./auth/tokenStore.ts";
 
-export function createExpressApp(store: TodoStore & UserStore): Express {
+export function createExpressApp(store: TodoStore & UserStore, tokenStore: AuthTokenStore): Express {
 	const app = express();
 	app.disable("x-powered-by");
+
+	const userService = new UserService(store);
 
 	const apiRouter = express.Router();
 	apiRouter.use(cookieParser());
 	apiRouter.use(csrfMw());
 	apiRouter.use(authMw());
 	apiRouter.use("/todos", new TodoController(new TodoService(store)).router());
-	apiRouter.use("/users", adminOnlyMw(), new UserController(new UserService(store)).router());
+	apiRouter.use("/users", adminOnlyMw(), new UserController(userService).router());
 
 	app.use("/api", apiRouter);
+	app.use("/auth", new AuthController(new AuthService(userService, tokenStore)).router());
 
 	// error handlers need to be after all routes are registered
 	app.use(permissionErrorMw());
