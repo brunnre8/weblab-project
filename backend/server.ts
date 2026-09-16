@@ -10,7 +10,7 @@ async function main() {
 		await store.insertUser(dummyAdminUser());
 	}
 
-	const app = createExpressApp(store);
+	const app = createExpressApp(store, store);
 
 	const server = app.listen(4444, (err) => {
 		if (err) {
