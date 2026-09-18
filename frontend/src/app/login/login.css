@@ -12,6 +12,6 @@
 form {
 	display: block flex;
 	width: 100%;
-	max-width: 480px;
+	max-width: var(--max-width-form);
 	flex-direction: column;
 }
