@@ -1,5 +1,6 @@
 import { Routes } from "@angular/router";
 import { TodoView } from "./todo-view/todo-view";
+import { Login } from "./login/login";
 
 export const routes: Routes = [
 	{
@@ -8,9 +9,9 @@ export const routes: Routes = [
 		title: "Home",
 		component: TodoView,
 	},
-	// {
-	// 	path: "hello",
-	// 	title: "Hello",
-	// 	component: Hello,
-	// },
+	{
+		path: "login",
+		title: "login",
+		component: Login,
+	},
 ];

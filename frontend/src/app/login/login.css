@@ -1,0 +1,17 @@
+:host {
+	flex-grow: 1;
+	display: flex;
+	justify-content: center;
+	padding: 0.5rem;
+
+	@media(max-width: 480px) {
+		padding-inline: 0px;
+	}
+}
+
+form {
+	display: block flex;
+	width: 100%;
+	max-width: 480px;
+	flex-direction: column;
+}
