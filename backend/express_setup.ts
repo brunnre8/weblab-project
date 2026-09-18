@@ -27,10 +27,11 @@ export function createExpressApp(store: TodoStore & UserStore, tokenStore: AuthT
 
 	const apiRouter = express.Router();
 	apiRouter.use(cookieParser());
-	apiRouter.use(csrfMw());
 	apiRouter.use(authMw());
 	apiRouter.use("/todos", new TodoController(new TodoService(store)).router());
 	apiRouter.use("/users", adminOnlyMw(), new UserController(userService).router());
+
+	app.use(csrfMw());
 
 	app.use("/api", apiRouter);
 	app.use("/auth", new AuthController(new AuthService(userService, tokenStore)).router());
