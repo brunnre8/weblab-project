@@ -1,7 +1,7 @@
 <form (submit)="onSubmit($event)" novalidate>
 	<mat-form-field>
 		<mat-label>Email</mat-label>
-		<input matInput [formField]="loginForm.email" />
+		<input matInput type="email" [formField]="loginForm.email" />
 		@if (loginForm.email().touched() && loginForm.email().invalid()) {
 		<mat-error>
 			{{loginForm.email().errors()[0].message}}

@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, inject, signal } from "@angular/core";
-import { form, FormField, minLength, required } from "@angular/forms/signals";
+import { email, form, FormField, minLength, required } from "@angular/forms/signals";
 import { MatButtonModule } from "@angular/material/button";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
@@ -25,6 +25,7 @@ export class Login {
 
 	loginForm = form(this.loginModel, (schema) => {
 		required(schema.email, { message: "email is required" });
+		email(schema.email, { message: "invalid email" });
 		required(schema.password, { message: "need password" });
 		minLength(schema.password, 15, { message: "need >15 chars" });
 	});
