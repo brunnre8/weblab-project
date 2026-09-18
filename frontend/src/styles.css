@@ -1,5 +1,9 @@
 @import "gruvbox.css";
 
+:root {
+	--bp-sm: 480px;
+}
+
 *,
 *::before,
 *::after {
