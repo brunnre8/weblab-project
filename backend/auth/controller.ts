@@ -1,5 +1,5 @@
 import express, { type CookieOptions, type Router, type Response } from "express";
-import type { AuthService } from "./service.ts";
+import { ErrInvalidCredentials, type AuthService } from "./service.ts";
 import { ErrBadInput, mustString } from "../helpers/conversions.ts";
 import type { CookieHelper } from "../helpers/cookieHelper.ts";
 import { AUTH_COOKIE_KEY } from "./cookiekey.ts";
@@ -29,12 +29,20 @@ export class AuthController {
 			}
 			const email = mustString(req.body.email);
 			const password = mustString(req.body.password);
-			const token = await this.#authService.login(email, password);
-			res.cookie(this.#authCookieName, token.token, {
-				...this.#authCookieTemplate,
-				expires: nowInMonths(1),
-			});
-			res.redirect(303, "/");
+			try {
+				const token = await this.#authService.login(email, password);
+				res.cookie(this.#authCookieName, token.token, {
+					...this.#authCookieTemplate,
+					expires: nowInMonths(1),
+				});
+				res.redirect(303, "/");
+			} catch (err) {
+				if (err instanceof ErrInvalidCredentials) {
+					res.sendStatus(401);
+					return;
+				}
+				throw err;
+			}
 		});
 
 		this.#router.post("/logout", async (req, res) => {
