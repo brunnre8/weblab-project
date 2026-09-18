@@ -2,12 +2,13 @@ import type { AddressInfo } from "node:net";
 import { dummyAdminUser } from "./middlewares/auth.ts";
 import { SqliteStore } from "./stores/sqlite.ts";
 import { createExpressApp } from "./express_setup.ts";
+import { UserCreds } from "./users/models.ts";
 
 async function main() {
 	const store = new SqliteStore(":memory:");
 
 	if (!(await store.hasUsers())) {
-		await store.insertUser(dummyAdminUser());
+		await store.insertUser(dummyAdminUser(), await UserCreds.fromPassword("admin".repeat(3)));
 	}
 
 	const app = createExpressApp(store, store);
