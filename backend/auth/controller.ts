@@ -1,6 +1,7 @@
 import express, { type CookieOptions, type Router } from "express";
 import type { AuthService } from "./service.ts";
 import { ErrBadInput, mustString } from "../helpers/conversions.ts";
+import { AUTH_COOKIE_NAME } from "./cookiename.ts";
 
 const authCookieTemplate: CookieOptions = {
 	httpOnly: true,
@@ -12,11 +13,9 @@ const authCookieTemplate: CookieOptions = {
 export class AuthController {
 	#authService: AuthService;
 	#router: Router;
-	#authCookieName: string;
 
 	constructor(authService: AuthService) {
 		this.#authService = authService;
-		this.#authCookieName = cookieName("authtoken");
 		this.#router = express.Router();
 		this.registerRoutes();
 	}
@@ -29,7 +28,7 @@ export class AuthController {
 			const email = mustString(req.body.email);
 			const password = mustString(req.body.password);
 			const token = await this.#authService.login(email, password);
-			res.cookie(this.#authCookieName, token.token, {
+			res.cookie(AUTH_COOKIE_NAME, token.token, {
 				...authCookieTemplate,
 				expires: nowInMonths(1),
 			});
@@ -40,12 +39,12 @@ export class AuthController {
 			if (!req.body) {
 				throw new ErrBadInput("expected json body");
 			}
-			const token = req.cookies[this.#authCookieName];
+			const token = req.cookies[AUTH_COOKIE_NAME];
 			if (!token) {
 				throw new ErrBadInput("logout with no token");
 			}
 			await this.#authService.logout(token);
-			res.clearCookie(this.#authCookieName, {
+			res.clearCookie(AUTH_COOKIE_NAME, {
 				...authCookieTemplate,
 			});
 			res.redirect(303, "/login");
@@ -55,10 +54,6 @@ export class AuthController {
 	router(): Router {
 		return this.#router;
 	}
-}
-
-function cookieName(name: string): string {
-	return `__Host-Http-${name}`;
 }
 
 function nowInMonths(months: number): Date {
