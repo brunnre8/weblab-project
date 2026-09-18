@@ -33,6 +33,7 @@ export class AuthController {
 				...authCookieTemplate,
 				expires: nowInMonths(1),
 			});
+			res.redirect(303, "/");
 		});
 
 		this.#router.post("/logout", async (req, res) => {
@@ -47,6 +48,7 @@ export class AuthController {
 			res.clearCookie(this.#authCookieName, {
 				...authCookieTemplate,
 			});
+			res.redirect(303, "/login");
 		});
 	}
 
