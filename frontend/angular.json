@@ -52,6 +52,9 @@
 				},
 				"serve": {
 					"builder": "@angular/build:dev-server",
+					"options": {
+						"proxyConfig": "config/proxy.conf.json"
+					},
 					"configurations": {
 						"production": {
 							"buildTarget": "weblab-project:build:production"
