@@ -8,6 +8,7 @@ export class ErrConflict extends Error {}
 export function permissionErrorMw(): ErrorRequestHandler {
 	return (err, _req, res, next) => {
 		if (err instanceof ErrPerm) {
+			console.error(err);
 			res.sendStatus(404); // don't leak existence to client
 			return;
 		}
@@ -28,6 +29,7 @@ export function noEntityErrorMw(): ErrorRequestHandler {
 export function badInputErrorMw(): ErrorRequestHandler {
 	return (err, _req, res, next) => {
 		if (err instanceof ErrBadInput) {
+			console.error(err);
 			res.sendStatus(400);
 			return;
 		}
@@ -38,6 +40,7 @@ export function badInputErrorMw(): ErrorRequestHandler {
 export function conflictErrorMw(): ErrorRequestHandler {
 	return (err, _req, res, next) => {
 		if (err instanceof ErrConflict) {
+			console.log(err);
 			res.sendStatus(409); // conflict
 			return;
 		}
