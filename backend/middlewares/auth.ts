@@ -2,7 +2,6 @@ import { type RequestHandler, type Request } from "express";
 import { type User } from "../users/models.ts";
 import { ErrPerm } from "./errors.ts";
 import type { AuthService } from "../auth/service.ts";
-import { redirectToLogin } from "../auth/controller.ts";
 
 // note: this isn't remotely pretty, but my TS foo is not good enough to pipe the request var
 // through the RequestHandler type mess... so we forcefully mush it in.
@@ -13,12 +12,12 @@ export function authMw(authService: AuthService, cookieName: string): RequestHan
 	return async (req: any, res, next) => {
 		const token = req.cookies[cookieName];
 		if (!token) {
-			redirectToLogin(res);
+			res.sendStatus(401);
 			return;
 		}
 		const user = await authService.userFromToken(token);
 		if (user === null) {
-			redirectToLogin(res);
+			res.sendStatus(401);
 			return;
 		}
 		req.user = user;

@@ -4,7 +4,7 @@ import { ErrBadInput, mustString } from "../helpers/conversions.ts";
 import type { CookieHelper } from "../helpers/cookieHelper.ts";
 import { AUTH_COOKIE_KEY } from "./cookiekey.ts";
 
-export function redirectToLogin(res: Response) {
+function redirectToLogin(res: Response) {
 	res.redirect(303, "/auth/login");
 }
 
