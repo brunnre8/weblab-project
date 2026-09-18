@@ -1,16 +1,27 @@
 import { type RequestHandler, type Request } from "express";
 import { type User } from "../users/models.ts";
 import { ErrPerm } from "./errors.ts";
+import type { AuthService } from "../auth/service.ts";
+import { redirectToLogin } from "../auth/controller.ts";
 
 // note: this isn't remotely pretty, but my TS foo is not good enough to pipe the request var
 // through the RequestHandler type mess... so we forcefully mush it in.
 // at least the damage is scoped to this module...
 
 // Enforces an authenticated user, injecting the user context into req.user
-export function authMw(): RequestHandler {
-	return (req: any, _res, next) => {
-		//TODO: actually implement this
-		req.user = dummyAdminUser();
+export function authMw(authService: AuthService, cookieName: string): RequestHandler {
+	return async (req: any, res, next) => {
+		const token = req.cookies[cookieName];
+		if (!token) {
+			redirectToLogin(res);
+			return;
+		}
+		const user = await authService.userFromToken(token);
+		if (user === null) {
+			redirectToLogin(res);
+			return;
+		}
+		req.user = user;
 		next();
 	};
 }

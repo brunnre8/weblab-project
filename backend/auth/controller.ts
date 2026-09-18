@@ -1,35 +1,37 @@
-import express, { type CookieOptions, type Router } from "express";
+import express, { type CookieOptions, type Router, type Response } from "express";
 import type { AuthService } from "./service.ts";
 import { ErrBadInput, mustString } from "../helpers/conversions.ts";
-import { AUTH_COOKIE_NAME } from "./cookiename.ts";
+import type { CookieHelper } from "../helpers/cookieHelper.ts";
+import { AUTH_COOKIE_KEY } from "./cookiekey.ts";
 
-const authCookieTemplate: CookieOptions = {
-	httpOnly: true,
-	secure: true,
-	sameSite: "strict",
-	path: "/",
-};
+export function redirectToLogin(res: Response) {
+	res.redirect(303, "/auth/login");
+}
 
 export class AuthController {
 	#authService: AuthService;
 	#router: Router;
+	#authCookieTemplate: CookieOptions;
+	#authCookieName: string;
 
-	constructor(authService: AuthService) {
+	constructor(authService: AuthService, cookieHelper: CookieHelper) {
 		this.#authService = authService;
 		this.#router = express.Router();
+		this.#authCookieTemplate = cookieHelper.cookieTemplate();
+		this.#authCookieName = cookieHelper.cookieName(AUTH_COOKIE_KEY);
 		this.registerRoutes();
 	}
 
 	private registerRoutes() {
-		this.#router.post("/login", async (req, res) => {
+		this.#router.post("/login", express.json(), async (req, res) => {
 			if (!req.body) {
 				throw new ErrBadInput("expected json body");
 			}
 			const email = mustString(req.body.email);
 			const password = mustString(req.body.password);
 			const token = await this.#authService.login(email, password);
-			res.cookie(AUTH_COOKIE_NAME, token.token, {
-				...authCookieTemplate,
+			res.cookie(this.#authCookieName, token.token, {
+				...this.#authCookieTemplate,
 				expires: nowInMonths(1),
 			});
 			res.redirect(303, "/");
@@ -39,15 +41,15 @@ export class AuthController {
 			if (!req.body) {
 				throw new ErrBadInput("expected json body");
 			}
-			const token = req.cookies[AUTH_COOKIE_NAME];
+			const token = req.cookies[this.#authCookieName];
 			if (!token) {
 				throw new ErrBadInput("logout with no token");
 			}
 			await this.#authService.logout(token);
-			res.clearCookie(AUTH_COOKIE_NAME, {
-				...authCookieTemplate,
+			res.clearCookie(this.#authCookieName, {
+				...this.#authCookieTemplate,
 			});
-			res.redirect(303, "/login");
+			redirectToLogin(res);
 		});
 	}
 

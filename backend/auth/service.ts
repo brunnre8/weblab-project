@@ -1,8 +1,9 @@
 import { randomBytes } from "crypto";
-import type { UserID } from "../users/models.ts";
+import type { User, UserID } from "../users/models.ts";
 import type { UserService } from "../users/service.ts";
 import type { AuthToken, AuthTokenStore, AuthTokenString } from "./tokenStore.ts";
-import { ErrPerm } from "../middlewares/errors.ts";
+import { ErrNoEnt, ErrPerm } from "../middlewares/errors.ts";
+import { ErrNoRows } from "../stores/errors.ts";
 
 export class ErrInvalidCredentials extends Error {}
 
@@ -26,6 +27,19 @@ export class AuthService {
 		const token = await newAuthToken(user.id);
 		this.#tokenStore.addAuthToken(token);
 		return token;
+	}
+
+	async userFromToken(raw: AuthTokenString): Promise<User | null> {
+		try {
+			const token = await this.#tokenStore.getAuthToken(raw);
+			const user = await this.#userService.getUser(token.userID);
+			return user;
+		} catch (err) {
+			if (err instanceof ErrNoRows || err instanceof ErrNoEnt) {
+				return null;
+			}
+			throw err; // internal error, bubble up
+		}
 	}
 
 	async logout(token: AuthTokenString) {

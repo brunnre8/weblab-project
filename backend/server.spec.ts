@@ -4,9 +4,11 @@ import supertest, { type Agent, type SuperTestStatic } from "supertest";
 
 import { createExpressApp } from "./express_setup.ts";
 import { SqliteStore } from "./stores/sqlite.ts";
-import type { User } from "./users/models.ts";
+import { UserCreds, type User } from "./users/models.ts";
 import { dummyTodo, dummyUser } from "./stores/sqlite.spec.ts";
 import type { Todo, TodoInput } from "./todos/models.ts";
+
+const ADMIN_PW = "admin".repeat(4);
 
 describe("server integration test", () => {
 	let app: Express;
@@ -20,9 +22,10 @@ describe("server integration test", () => {
 	beforeEach(async () => {
 		store = new SqliteStore(":memory:");
 		[admin, billy, maria] = await populateDummy(store);
-		app = createExpressApp(store);
+		app = createExpressApp(store, store, true);
 		agent = supertest.agent(app);
 		agent.set("sec-fetch-site", "same-origin");
+		await agent.post("/auth/login").send({ email: admin.email, password: ADMIN_PW });
 	});
 
 	afterEach(() => {
@@ -174,7 +177,8 @@ describe("server integration test", () => {
 
 async function populateDummy(db: SqliteStore): Promise<[User, User, User]> {
 	const admin = dummyUser({ name: "admin", role: "admin" });
-	admin.id = await db.insertUser(admin);
+	const adminCreds = await UserCreds.fromPassword(ADMIN_PW);
+	admin.id = await db.insertUser(admin, adminCreds);
 	const billy = dummyUser({ name: "billy" });
 	billy.id = await db.insertUser(billy);
 	const maria = dummyUser({ name: "maria" });
