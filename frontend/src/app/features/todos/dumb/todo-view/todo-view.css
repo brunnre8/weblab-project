@@ -14,6 +14,7 @@ a {
 mat-card-content p {
 	white-space: pre-wrap;
 	overflow: hidden;
+	text-overflow: ellipsis;
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: var(--max-lines);
