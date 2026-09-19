@@ -1,5 +1,5 @@
 import { Component, computed, input } from "@angular/core";
-import { dummyTodo } from "../../models/todo";
+import { dummyTodo } from "../models/todo";
 import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
