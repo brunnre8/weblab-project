@@ -1,14 +1,29 @@
+import * as z from "zod";
+export type TodoID = number;
+
 export class Todo {
+	id: TodoID;
 	title: string;
 	body: string;
 	createdAt: Date;
+	// TODO: owner
 
 	constructor(title: string, body: string) {
+		this.id = -1;
 		this.title = title;
 		this.body = body;
 		this.createdAt = new Date();
 	}
 }
+
+const TodoInputSchema = z.compile(
+	z.object({
+		title: z.string(),
+		body: z.string(),
+		createdAt: z.coerce.date(),
+		ownerID: z.int().nonnegative(),
+	}),
+);
 
 export const dummyTodo = new Todo(
 	"hello world",
