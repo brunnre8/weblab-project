@@ -33,6 +33,6 @@ mat-card-content p {
 	color: var(--mat-sys-primary);
 }
 
-.spacer {
-	flex: auto;
+mat-card {
+	height: 100%;
 }
