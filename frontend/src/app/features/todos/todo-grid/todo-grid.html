@@ -1,0 +1,9 @@
+@if(todos.isLoading()){
+<div class='loader'>
+	<mat-spinner [diameter]="50"></mat-spinner>
+</div>
+} @else if (todos.error()){
+<p>{{todos.error()?.message ?? "unkown error"}}</p>
+} @else {
+<app-todo-list [todos]="todos.value()"></app-todo-list>
+}
