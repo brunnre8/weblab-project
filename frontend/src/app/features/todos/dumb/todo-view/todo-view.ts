@@ -4,7 +4,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
 import { RouterLink } from "@angular/router";
 import { DatePipe } from "@angular/common";
-import { dummyTodo } from "../../../../models/todo";
+import { Todo } from "../../../../models/todo";
 
 @Component({
 	selector: "app-todo-view",
@@ -13,7 +13,7 @@ import { dummyTodo } from "../../../../models/todo";
 	styleUrl: "./todo-view.css",
 })
 export class TodoView {
-	todo = input(dummyTodo);
+	todo = input.required<Todo>();
 	max_lines = input<number>();
 	max_lines_var = computed(() => this.max_lines() ?? "Undefined");
 

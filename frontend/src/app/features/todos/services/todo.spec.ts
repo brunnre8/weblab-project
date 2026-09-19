@@ -38,11 +38,13 @@ const dummyTodos: Todo[] = [
 		title: "title A",
 		body: "body A",
 		createdAt: new Date(),
+		ownerID: 1,
 	},
 	{
 		id: 2,
 		title: "title B",
 		body: "body B",
 		createdAt: new Date(),
+		ownerID: 1,
 	},
 ];

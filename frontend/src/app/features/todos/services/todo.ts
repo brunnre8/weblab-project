@@ -1,10 +1,10 @@
 import { httpResource } from "@angular/common/http";
 import { Resource, Service } from "@angular/core";
-import { Todo } from "../../../models/todo";
+import { parseTodoArray, Todo } from "../../../models/todo";
 
 @Service()
 export class TodoService {
-	#todoResource = httpResource<Todo[]>(() => "/api/todos/", { defaultValue: [] });
+	#todoResource = httpResource<Todo[]>(() => "/api/todos/", { defaultValue: [], parse: parseTodoArray });
 
 	allTodos(): Resource<Todo[]> {
 		this.#todoResource.reload();
