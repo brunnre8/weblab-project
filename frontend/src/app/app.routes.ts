@@ -1,8 +1,8 @@
 import { Routes } from "@angular/router";
-import { TodoView } from "./todo-view/todo-view";
 import { Login } from "./login/login";
 import { TodoList } from "./features/todos/dumb/todo-list/todo-list";
 import { Todo } from "./models/todo";
+import { TodoView } from "./features/todos/dumb/todo-view/todo-view";
 
 const dummyTodos: Todo[] = [
 	{
