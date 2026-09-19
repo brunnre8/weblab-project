@@ -1,4 +1,4 @@
-import { Component, inject, effect } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { TodoService } from "../services/todo";
 import { TodoList } from "../dumb/todo-list/todo-list";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
@@ -12,5 +12,4 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 export class TodoGrid {
 	todoService = inject(TodoService);
 	todos = this.todoService.allTodos();
-	errors = effect(() => console.log(this.todos.error()));
 }
