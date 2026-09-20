@@ -2,7 +2,6 @@ import { Component, inject, input, numberAttribute } from "@angular/core";
 import { TodoEditModel, TodoForm } from "../dumb/todo-form/todo-form";
 import { TodoID } from "../../../models/todo";
 import { TodoService } from "../services/todo";
-import { Router } from "@angular/router";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { Location } from "@angular/common";
 
@@ -14,7 +13,6 @@ import { Location } from "@angular/common";
 })
 export class TodoEdit {
 	private todoService = inject(TodoService);
-	private router = inject(Router);
 	private location = inject(Location);
 	todoID = input.required<TodoID, string>({ transform: numberAttribute });
 	todoRes = this.todoService.getTodo(this.todoID);
@@ -34,7 +32,7 @@ export class TodoEdit {
 			body: data.body.trim(),
 			createdAt: todo.createdAt,
 		});
-		await this.router.navigate(["/todo", todo.id]);
+		this.location.back();
 	}
 
 	async onCancel() {
