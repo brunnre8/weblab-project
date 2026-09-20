@@ -1,5 +1,11 @@
-<div class='container'>
-	@for(todo of todos(); track todo.id){
-		<app-todo-view [todo]="todo" [max_lines]="10" ></app-todo-view>
-	}
+<div class="container">
+	<a routerLink="/todo/new/" matFab extended>
+		<mat-icon>add</mat-icon>
+		Add new
+	</a>
+	<div class='grid'>
+		@for(todo of todos(); track todo.id){
+			<app-todo-view [todo]="todo" [max_lines]="10" ></app-todo-view>
+		}
+	</div>
 </div>
