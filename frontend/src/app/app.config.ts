@@ -2,12 +2,13 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners } from "@angular/
 import { provideRouter, withComponentInputBinding } from "@angular/router";
 
 import { routes } from "./app.routes";
-import { provideHttpClient, withNoXsrfProtection } from "@angular/common/http";
+import { provideHttpClient, withInterceptors, withNoXsrfProtection } from "@angular/common/http";
+import { authFailureInterceptor } from "./auth/auth-failure-interceptor";
 
 export const appConfig: ApplicationConfig = {
 	providers: [
 		provideBrowserGlobalErrorListeners(),
 		provideRouter(routes, withComponentInputBinding({ queryParams: false })),
-		provideHttpClient(withNoXsrfProtection()),
+		provideHttpClient(withNoXsrfProtection(), withInterceptors([authFailureInterceptor])),
 	],
 };
