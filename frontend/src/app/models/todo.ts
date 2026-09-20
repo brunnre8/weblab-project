@@ -25,3 +25,7 @@ const TodoInputArraySchema = z.compile(z.array(TodoInputSchema));
 export function parseTodoArray(raw: unknown): Todo[] {
 	return TodoInputArraySchema.parse(raw);
 }
+
+export function parseTodo(raw: unknown): Todo {
+	return TodoInputSchema.parse(raw);
+}
