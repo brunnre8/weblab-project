@@ -47,7 +47,6 @@ export class Login {
 			)
 			.subscribe({
 				next: () => {
-					console.log("asdf");
 					this.router.navigate(["/"]);
 				},
 				// TODO: fix error handling
