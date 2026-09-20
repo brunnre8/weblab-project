@@ -9,6 +9,10 @@ a {
 	&:hover {
 		text-decoration: underline;
 	}
+
+	&:focus-visible {
+		outline: thin solid var(--mat-sys-on-surface);
+	}
 }
 
 mat-card-content p {
