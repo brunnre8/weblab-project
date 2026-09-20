@@ -3,7 +3,6 @@ import { dummyAdminUser } from "./middlewares/auth.ts";
 import { SqliteStore } from "./stores/sqlite.ts";
 import { createExpressApp } from "./express_setup.ts";
 import { UserCreds } from "./users/models.ts";
-import type { TodoInput } from "./todos/models.ts";
 
 const dummyTodos = [
 	{
@@ -38,10 +37,12 @@ async function main() {
 
 	if (!(await store.hasUsers())) {
 		const adminID = await store.insertUser(dummyAdminUser(), await UserCreds.fromPassword("admin".repeat(3)));
-		await dummyTodos.map(async (t: any) => {
-			t.ownerID = adminID;
-			await store.insertTodo(t);
-		});
+		await Promise.all(
+			dummyTodos.map(async (t: any) => {
+				t.ownerID = adminID;
+				await store.insertTodo(t);
+			}),
+		);
 	}
 
 	const app = createExpressApp(store, store);
