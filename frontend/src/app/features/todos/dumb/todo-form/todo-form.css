@@ -16,3 +16,8 @@ form {
 	flex-direction: column;
 	gap: 12px;
 }
+
+textarea {
+	field-sizing: content;
+	min-height: 20rem;
+}

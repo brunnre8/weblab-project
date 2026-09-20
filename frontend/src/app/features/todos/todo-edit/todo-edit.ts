@@ -30,8 +30,8 @@ export class TodoEdit {
 		}
 		await this.todoService.updateTodo({
 			id: todo.id,
-			title: data.title,
-			body: data.body,
+			title: data.title.trim(),
+			body: data.body.trim(),
 			createdAt: todo.createdAt,
 		});
 		await this.router.navigate(["/todo", todo.id]);
