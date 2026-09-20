@@ -1,0 +1,20 @@
+<mat-card>
+	<mat-card-header>
+		<mat-card-title class='title'>
+			{{todo().title}}
+		</mat-card-title>
+	</mat-card-header>
+	<div class="time">
+		<mat-icon inline>calendar_today</mat-icon>
+		<span>{{todo().createdAt | date}}</span>
+	</div>
+	<mat-card-content>
+		<p>{{todo().body}}</p>
+	</mat-card-content>
+	<div class='spacer'></div>
+	<mat-card-actions>
+		<button matButton (click)="onEdit.emit(todo())"><mat-icon>edit</mat-icon>Edit</button>
+		<button matButton (click)="onDelete.emit(todo())"
+			[disabled]="!canDelete()"><mat-icon>delete</mat-icon>Delete</button>
+	</mat-card-actions>
+</mat-card>

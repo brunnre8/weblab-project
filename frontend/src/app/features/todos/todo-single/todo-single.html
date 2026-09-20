@@ -5,5 +5,6 @@
 } @else if (todo.error()){
 <p>{{todo.error()?.message ?? "unkown error"}}</p>
 } @else if (todo.hasValue()){
-<app-todo-view [todo]="todo.value()"></app-todo-view>
+<app-todo-full [todo]="todo.value()" [canDelete]="!deleteInFlight()" (onDelete)="onDelete($event)"
+	(onEdit)="onEdit($event)"></app-todo-full>
 }

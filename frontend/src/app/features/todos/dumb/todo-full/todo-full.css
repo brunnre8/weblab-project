@@ -1,0 +1,43 @@
+:host {
+	display: block;
+}
+
+a {
+	all: inherit;
+	cursor: pointer;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
+mat-card-content p {
+	white-space: pre-wrap;
+	overflow: auto;
+}
+
+.spacer {
+	flex-grow: 1;
+}
+
+.time {
+	padding-left: 16px;
+	display: flex;
+	gap: 4px;
+	opacity: 0.6;
+	font: var(--mat-sys-body-small);
+}
+
+.title {
+	color: var(--mat-sys-primary);
+}
+
+mat-card {
+	max-width: 1000px;
+	min-width: 300px;
+	min-height: 200px;
+}
+
+mat-card-actions {
+	gap: 50px;
+}

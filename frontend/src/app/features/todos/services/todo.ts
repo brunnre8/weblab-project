@@ -1,10 +1,11 @@
-import { httpResource } from "@angular/common/http";
-import { resource, Resource, Service, Signal } from "@angular/core";
+import { HttpClient, httpResource } from "@angular/common/http";
+import { inject, resource, Resource, Service, Signal } from "@angular/core";
 import { parseTodoArray, Todo, TodoID } from "../../../models/todo";
 
 @Service()
 export class TodoService {
 	#todoResource = httpResource<Todo[]>(() => "/api/todos/", { defaultValue: [], parse: parseTodoArray });
+	#http = inject(HttpClient);
 
 	allTodos(): Resource<Todo[]> {
 		this.#todoResource.reload();
@@ -18,6 +19,15 @@ export class TodoService {
 				return { id: id(), todos: todos };
 			},
 			loader: async ({ params }) => params.todos.find((t) => t.id === params.id),
+		});
+	}
+
+	async deleteTodo(id: TodoID): Promise<void> {
+		return new Promise((resolve, reject) => {
+			this.#http.delete(`/api/todos/${id}`, { responseType: "text" }).subscribe({
+				complete: resolve,
+				error: reject,
+			});
 		});
 	}
 }
