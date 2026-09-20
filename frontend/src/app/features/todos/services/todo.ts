@@ -1,6 +1,7 @@
 import { HttpClient, httpResource } from "@angular/common/http";
 import { inject, resource, Resource, Service, Signal } from "@angular/core";
 import { parseTodoArray, Todo, TodoID } from "../../../models/todo";
+import { firstValueFrom, map } from "rxjs";
 
 @Service()
 export class TodoService {
@@ -23,11 +24,6 @@ export class TodoService {
 	}
 
 	async deleteTodo(id: TodoID): Promise<void> {
-		return new Promise((resolve, reject) => {
-			this.#http.delete(`/api/todos/${id}`, { responseType: "text" }).subscribe({
-				complete: resolve,
-				error: reject,
-			});
-		});
+		return firstValueFrom(this.#http.delete(`/api/todos/${id}`, { responseType: "text" }).pipe(map(() => undefined)));
 	}
 }
