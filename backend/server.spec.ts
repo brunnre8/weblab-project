@@ -1,6 +1,6 @@
 import { test, describe, beforeEach, afterEach, expect } from "vitest";
 import { type Express } from "express";
-import supertest, { type Agent, type SuperTestStatic } from "supertest";
+import supertest, { type Agent } from "supertest";
 
 import { createExpressApp } from "./express_setup.ts";
 import { SqliteStore } from "./stores/sqlite.ts";
