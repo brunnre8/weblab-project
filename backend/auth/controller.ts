@@ -3,6 +3,7 @@ import { ErrInvalidCredentials, type AuthService } from "./service.ts";
 import { ErrBadInput, mustString } from "../helpers/conversions.ts";
 import type { CookieHelper } from "../helpers/cookieHelper.ts";
 import { AUTH_COOKIE_KEY } from "./cookiekey.ts";
+import { ErrPerm } from "../middlewares/errors.ts";
 
 function redirectToLogin(res: Response) {
 	res.redirect(303, "/auth/login");
@@ -39,6 +40,10 @@ export class AuthController {
 			} catch (err) {
 				if (err instanceof ErrInvalidCredentials) {
 					res.sendStatus(401);
+					return;
+				}
+				if (err instanceof ErrPerm) {
+					res.sendStatus(403); // legal creds, but we prevent login
 					return;
 				}
 				throw err;
