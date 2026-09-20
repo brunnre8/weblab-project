@@ -1,13 +1,12 @@
-.container {
-	display: flex;
-	flex-direction: column;
-	align-items: start;
-	gap: 10px;
-	margin: 10px;
-}
-
 .grid {
+	margin: 10px;
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 	gap: 10px;
+}
+
+#newBtn {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
 }
