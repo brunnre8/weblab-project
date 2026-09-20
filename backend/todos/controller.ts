@@ -34,6 +34,14 @@ export class TodoController {
 			res.json(todo);
 		});
 
+		// get
+		this.#router.get("/:id", async (req, res) => {
+			const user = userFromRequest(req);
+			const todoID: TodoID = safeInt(req.params.id);
+			const todo = await this.#todoService.getTodo(todoID, user);
+			res.send(todo);
+		});
+
 		// update
 		this.#router.put("/:id", express.json(), async (req, res) => {
 			if (!req.body) {

@@ -99,6 +99,18 @@ describe("server integration test", () => {
 			expect(response.body[0]).toMatchObject({ title: "admin todo", ownerID: admin.id });
 		});
 
+		test("get /api/todos/:id", async () => {
+			let response = await agent.get("/api/todos/1");
+			expect(response.status).toBe(200);
+			expect(response.status).toBe(200);
+			expect(response.headers["content-type"]).toMatch(/^application\/json;/);
+			expect(response.body).toMatchObject({
+				title: "admin todo",
+				body: "Lorem ipsum dolor achmet...",
+				ownerID: admin.id,
+			});
+		});
+
 		test("delete /api/todos/:id", async () => {
 			let response = await agent.delete("/api/todos/1");
 			expect(response.status).toBe(200);
