@@ -12,14 +12,13 @@ export interface Todo {
 	ownerID: UserID;
 }
 
-export type TodoInput = Omit<Todo, "id">;
+export type TodoInput = Omit<Todo, "id" | "ownerID">;
 
 const TodoInputSchema = z.compile(
 	z.object({
 		title: z.string(),
 		body: z.string(),
-		createdAt: z.coerce.date(),
-		ownerID: z.int().nonnegative(),
+		createdAt: z.coerce.date().default(new Date()),
 	}),
 );
 
