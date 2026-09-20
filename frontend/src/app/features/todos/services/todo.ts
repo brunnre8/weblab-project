@@ -1,6 +1,6 @@
 import { HttpClient, httpResource } from "@angular/common/http";
 import { EnvironmentInjector, inject, Resource, Service, Signal } from "@angular/core";
-import { parseTodo, parseTodoArray, Todo, TodoID } from "../../../models/todo";
+import { parseTodo, parseTodoArray, Todo, TodoID, TodoInsert, TodoUpdate } from "../../../models/todo";
 import { firstValueFrom, map } from "rxjs";
 
 @Service()
@@ -22,5 +22,26 @@ export class TodoService {
 
 	async deleteTodo(id: TodoID): Promise<void> {
 		return firstValueFrom(this.#http.delete(`/api/todos/${id}`, { responseType: "text" }).pipe(map(() => undefined)));
+	}
+
+	async updateTodo(todo: TodoUpdate): Promise<void> {
+		return firstValueFrom(
+			this.#http.put(`/api/todos/${todo.id}`, todo, { responseType: "text" }).pipe(map(() => undefined)),
+		);
+	}
+
+	async addTodo(todo: TodoInsert): Promise<void> {
+		return firstValueFrom(
+			this.#http
+				.post(
+					"/api/todos/new",
+					{
+						title: todo.title,
+						body: todo.body,
+					},
+					{ responseType: "text" },
+				)
+				.pipe(map(() => undefined)),
+		);
 	}
 }

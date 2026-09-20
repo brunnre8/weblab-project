@@ -1,0 +1,10 @@
+@if(todoRes.isLoading()){
+<div class='loader'>
+	<mat-spinner [diameter]="50"></mat-spinner>
+</div>
+} @else if (todoRes.error()){
+<p>{{todoRes.error()?.message ?? "unkown error"}}</p>
+} @else if (todoRes.hasValue()){
+@let todo = todoRes.value();
+<app-todo-form [title]="todo.title" [body]="todo.body" (submit)="onSubmit($event)" (cancel)="onCancel()"></app-todo-form>
+}

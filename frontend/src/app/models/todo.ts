@@ -10,6 +10,13 @@ export interface Todo {
 	ownerID: number;
 }
 
+export interface TodoInsert {
+	title: string;
+	body: string;
+}
+
+export type TodoUpdate = Omit<Todo, "ownerID">;
+
 const TodoInputSchema = z.compile(
 	z.object({
 		id: z.number(),
