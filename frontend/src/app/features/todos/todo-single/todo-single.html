@@ -1,0 +1,9 @@
+@if(todo.isLoading()){
+<div class='loader'>
+	<mat-spinner [diameter]="50"></mat-spinner>
+</div>
+} @else if (todo.error()){
+<p>{{todo.error()?.message ?? "unkown error"}}</p>
+} @else if (todo.hasValue()){
+<app-todo-view [todo]="todo.value()"></app-todo-view>
+}
