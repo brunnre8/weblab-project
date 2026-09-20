@@ -9,7 +9,7 @@ export function permissionErrorMw(): ErrorRequestHandler {
 	return (err, _req, res, next) => {
 		if (err instanceof ErrPerm) {
 			console.error(err);
-			res.sendStatus(404); // don't leak existence to client
+			res.sendStatus(403);
 			return;
 		}
 		next(err);
