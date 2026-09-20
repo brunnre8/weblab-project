@@ -1,6 +1,6 @@
 import { Component, inject, input, numberAttribute } from "@angular/core";
 import { TodoEditModel, TodoForm } from "../dumb/todo-form/todo-form";
-import { Todo, TodoID } from "../../../models/todo";
+import { TodoID } from "../../../models/todo";
 import { TodoService } from "../services/todo";
 import { Router } from "@angular/router";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
