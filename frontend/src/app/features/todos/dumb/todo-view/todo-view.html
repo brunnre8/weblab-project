@@ -2,7 +2,7 @@
 	<mat-card-header>
 		<mat-card-title class='title'>
 			<a routerLink='/todo/{{todo().id}}'>
-				{{todo().title}}
+				{{todo().title || 'no title'}}
 			</a>
 		</mat-card-title>
 	</mat-card-header>
