@@ -7,20 +7,45 @@ import type { AuthService } from "../auth/service.ts";
 // through the RequestHandler type mess... so we forcefully mush it in.
 // at least the damage is scoped to this module...
 
-// Enforces an authenticated user, injecting the user context into req.user
-export function authMw(authService: AuthService, cookieName: string): RequestHandler {
-	return async (req: any, res, next) => {
+function userFromRequestUnsafe(req: Request): User | undefined {
+	const user = (req as any).user;
+	return user;
+}
+
+export function userFromRequest(req: Request): User {
+	const user = userFromRequestUnsafe(req);
+	if (!user) {
+		throw new Error("no user present, ensure authMw is in the middleware chain before you call this function");
+	}
+	return user;
+}
+
+// injects the user context into req.user without doing access control
+export function addUserMw(authService: AuthService, cookieName: string): RequestHandler {
+	return async (req: any, _res, next) => {
 		const token = req.cookies[cookieName];
 		if (!token) {
-			res.sendStatus(401);
+			next();
 			return;
 		}
 		const user = await authService.userFromToken(token);
 		if (user === null) {
-			res.sendStatus(401);
+			next();
 			return;
 		}
 		req.user = user;
+		next();
+	};
+}
+
+// Enforces an authenticated user
+export function requireUserMw(): RequestHandler {
+	return async (req: any, res, next) => {
+		const user = userFromRequestUnsafe(req);
+		if (!user) {
+			res.sendStatus(401);
+			return;
+		}
 		next();
 	};
 }
@@ -34,14 +59,6 @@ export function adminOnlyMw(): RequestHandler {
 		}
 		next();
 	};
-}
-
-export function userFromRequest(req: Request): User {
-	const user = (req as any).user;
-	if (!user) {
-		throw new Error("no user present, ensure authMw is in the middleware chain before you call this function");
-	}
-	return user;
 }
 
 export function dummyAdminUser(): User {

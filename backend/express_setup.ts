@@ -1,5 +1,5 @@
 import express, { type Express } from "express";
-import { adminOnlyMw, authMw } from "./middlewares/auth.ts";
+import { addUserMw, adminOnlyMw, requireUserMw } from "./middlewares/auth.ts";
 import {
 	permissionErrorMw,
 	noEntityErrorMw,
@@ -34,12 +34,13 @@ export function createExpressApp(
 	const cookieHelper = new CookieHelper(!!insecure);
 
 	const apiRouter = express.Router();
-	apiRouter.use(cookieParser());
-	apiRouter.use(authMw(authService, cookieHelper.cookieName(AUTH_COOKIE_KEY)));
+	apiRouter.use(requireUserMw());
 	apiRouter.use("/todos", new TodoController(new TodoService(store)).router());
 	apiRouter.use("/users", adminOnlyMw(), new UserController(userService).router());
 
 	app.use(csrfMw());
+	app.use(cookieParser());
+	app.use(addUserMw(authService, cookieHelper.cookieName(AUTH_COOKIE_KEY)));
 
 	app.use("/api", apiRouter);
 	app.use("/auth", new AuthController(authService, cookieHelper).router());
