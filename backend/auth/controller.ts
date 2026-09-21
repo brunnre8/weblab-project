@@ -4,6 +4,7 @@ import { ErrBadInput, mustString } from "../helpers/conversions.ts";
 import type { CookieHelper } from "../helpers/cookieHelper.ts";
 import { AUTH_COOKIE_KEY } from "./cookiekey.ts";
 import { ErrPerm } from "../middlewares/errors.ts";
+import { userFromRequest } from "../middlewares/auth.ts";
 
 function redirectToLogin(res: Response) {
 	res.redirect(303, "/auth/login");
@@ -63,6 +64,16 @@ export class AuthController {
 				...this.#authCookieTemplate,
 			});
 			redirectToLogin(res);
+		});
+
+		this.#router.get("/self", async (req, res) => {
+			try {
+				const user = userFromRequest(req);
+				res.send(user);
+				return;
+			} catch (_err) {
+				res.sendStatus(404);
+			}
 		});
 	}
 
