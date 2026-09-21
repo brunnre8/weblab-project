@@ -3,6 +3,7 @@ import { Login } from "./login/login";
 import { TodoGrid } from "./features/todos/todo-grid/todo-grid";
 import { TodoSingle } from "./features/todos/todo-single/todo-single";
 import { TodoEdit } from "./features/todos/todo-edit/todo-edit";
+import { TodoNew } from "./features/todos/todo-new/todo-new";
 
 export const routes: Routes = [
 	{
@@ -14,6 +15,11 @@ export const routes: Routes = [
 		path: "",
 		title: "Home",
 		component: TodoGrid,
+	},
+	{
+		path: "todo/new",
+		title: "new todo",
+		component: TodoNew,
 	},
 	{
 		path: "todo/edit/:todoID",
