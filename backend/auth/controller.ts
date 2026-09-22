@@ -6,10 +6,6 @@ import { AUTH_COOKIE_KEY } from "./cookiekey.ts";
 import { ErrPerm } from "../middlewares/errors.ts";
 import { userFromRequest } from "../middlewares/auth.ts";
 
-function redirectToLogin(res: Response) {
-	res.redirect(303, "/auth/login");
-}
-
 export class AuthController {
 	#authService: AuthService;
 	#router: Router;
@@ -52,18 +48,19 @@ export class AuthController {
 		});
 
 		this.#router.post("/logout", async (req, res) => {
-			if (!req.body) {
-				throw new ErrBadInput("expected json body");
-			}
 			const token = req.cookies[this.#authCookieName];
 			if (!token) {
 				throw new ErrBadInput("logout with no token");
 			}
-			await this.#authService.logout(token);
+			try {
+				await this.#authService.logout(token);
+			} catch (err) {
+				console.log(err);
+			}
 			res.clearCookie(this.#authCookieName, {
 				...this.#authCookieTemplate,
 			});
-			redirectToLogin(res);
+			res.sendStatus(200);
 		});
 
 		this.#router.get("/self", async (req, res) => {
