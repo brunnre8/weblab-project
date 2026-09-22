@@ -6,6 +6,10 @@ import { ErrNoEnt, ErrPerm } from "../middlewares/errors.ts";
 import { ErrNoRows } from "../stores/errors.ts";
 
 export class ErrInvalidCredentials extends Error {}
+export interface UserAndToken {
+	user: User;
+	authToken: AuthToken;
+}
 
 export class AuthService {
 	#userService: UserService;
@@ -16,7 +20,7 @@ export class AuthService {
 		this.#tokenStore = authTokenStore;
 	}
 
-	async login(email: string, password: string): Promise<AuthToken> {
+	async login(email: string, password: string): Promise<UserAndToken> {
 		const user = await this.#userService.userFromLogin(email, password);
 		if (user === null) {
 			throw new ErrInvalidCredentials("email / pw missmatch");
@@ -26,7 +30,7 @@ export class AuthService {
 		}
 		const token = await newAuthToken(user.id);
 		this.#tokenStore.addAuthToken(token);
-		return token;
+		return { authToken: token, user: user };
 	}
 
 	async userFromToken(raw: AuthTokenString): Promise<User | null> {

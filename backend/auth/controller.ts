@@ -32,12 +32,12 @@ export class AuthController {
 			const email = mustString(req.body.email);
 			const password = mustString(req.body.password);
 			try {
-				const token = await this.#authService.login(email, password);
-				res.cookie(this.#authCookieName, token.token, {
+				const { user, authToken } = await this.#authService.login(email, password);
+				res.cookie(this.#authCookieName, authToken.token, {
 					...this.#authCookieTemplate,
 					expires: nowInMonths(1),
 				});
-				res.redirect(303, "/");
+				res.send(user);
 			} catch (err) {
 				if (err instanceof ErrInvalidCredentials) {
 					res.sendStatus(401);
