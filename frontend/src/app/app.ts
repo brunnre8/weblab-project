@@ -1,8 +1,9 @@
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import { RouterLink, RouterOutlet } from "@angular/router";
 import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
 import { MatToolbarModule } from "@angular/material/toolbar";
+import { IdendityService } from "./login/services/identityService";
 
 @Component({
 	selector: "app-root",
@@ -10,4 +11,7 @@ import { MatToolbarModule } from "@angular/material/toolbar";
 	templateUrl: "./app.html",
 	styleUrl: "./app.css",
 })
-export class App {}
+export class App {
+	private idendityService = inject(IdendityService);
+	idendity = this.idendityService.getSelf();
+}

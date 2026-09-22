@@ -2,6 +2,11 @@
 	<mat-toolbar>
 		<a routerLink="/" matIconButton><mat-icon>home</mat-icon></a>
 		<span>Todo Keeper</span>
+		<div class='spacer'></div>
+		@let self = idendity();
+		@if(self && self.role === "admin"){
+		<a routerLink="/users/" mat-button>Users</a>
+		}
 	</mat-toolbar>
 </header>
 <router-outlet />
