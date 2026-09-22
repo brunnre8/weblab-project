@@ -1,6 +1,6 @@
-import { Component, inject, input, numberAttribute, OnInit, signal } from "@angular/core";
+import { Component, inject, input, numberAttribute, signal } from "@angular/core";
 import { TodoService } from "../services/todo";
-import { Todo, TodoID } from "../../../models/todo";
+import { Todo, TodoID } from "../../models/todo";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { TodoFull } from "../dumb/todo-full/todo-full";
 import { Router } from "@angular/router";

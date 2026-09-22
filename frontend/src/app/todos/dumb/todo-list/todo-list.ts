@@ -1,9 +1,9 @@
 import { Component, input } from "@angular/core";
-import { Todo } from "../../../../models/todo";
 import { TodoView } from "../todo-view/todo-view";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { RouterLink } from "@angular/router";
+import { Todo } from "../../../models/todo";
 
 @Component({
 	selector: "app-todo-list",

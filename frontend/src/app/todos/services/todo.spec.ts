@@ -3,7 +3,7 @@ import { TestBed } from "@angular/core/testing";
 import { TodoService } from "./todo";
 import { HttpTestingController, provideHttpClientTesting } from "@angular/common/http/testing";
 import { provideHttpClient } from "@angular/common/http";
-import { Todo } from "../../../models/todo";
+import { Todo } from "../../models/todo";
 
 describe("Todo", () => {
 	let httpTesting: HttpTestingController;

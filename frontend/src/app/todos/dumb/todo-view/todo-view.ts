@@ -4,7 +4,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
 import { RouterLink } from "@angular/router";
 import { DatePipe } from "@angular/common";
-import { Todo } from "../../../../models/todo";
+import { Todo } from "../../../models/todo";
 
 @Component({
 	selector: "app-todo-view",

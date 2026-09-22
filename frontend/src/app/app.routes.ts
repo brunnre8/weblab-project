@@ -1,9 +1,9 @@
 import { Routes } from "@angular/router";
 import { Login } from "./login/login";
-import { TodoGrid } from "./features/todos/todo-grid/todo-grid";
-import { TodoSingle } from "./features/todos/todo-single/todo-single";
-import { TodoEdit } from "./features/todos/todo-edit/todo-edit";
-import { TodoNew } from "./features/todos/todo-new/todo-new";
+import { TodoGrid } from "./todos/todo-grid/todo-grid";
+import { TodoNew } from "./todos/todo-new/todo-new";
+import { TodoEdit } from "./todos/todo-edit/todo-edit";
+import { TodoSingle } from "./todos/todo-single/todo-single";
 
 export const routes: Routes = [
 	{

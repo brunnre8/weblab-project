@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { TodoView } from "./todo-view";
 
 import { provideRouter } from "@angular/router";
-import { Todo } from "../../../../models/todo";
+import { Todo } from "../../../models/todo";
 
 const dummyTodo: Todo = {
 	id: 0,

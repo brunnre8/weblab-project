@@ -1,6 +1,6 @@
 import { HttpClient, httpResource } from "@angular/common/http";
 import { EnvironmentInjector, inject, Resource, Service, Signal } from "@angular/core";
-import { parseTodo, parseTodoArray, Todo, TodoID, TodoInsert, TodoUpdate } from "../../../models/todo";
+import { parseTodo, parseTodoArray, Todo, TodoID, TodoInsert, TodoUpdate } from "../../models/todo";
 import { firstValueFrom, map } from "rxjs";
 
 @Service()

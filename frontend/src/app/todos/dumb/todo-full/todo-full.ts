@@ -3,7 +3,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatIconModule } from "@angular/material/icon";
 import { DatePipe } from "@angular/common";
-import { Todo } from "../../../../models/todo";
+import { Todo } from "../../../models/todo";
 
 @Component({
 	selector: "app-todo-full",
