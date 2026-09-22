@@ -4,7 +4,7 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatButtonModule } from "@angular/material/button";
 import { MatToolbarModule } from "@angular/material/toolbar";
 import { IdendityService } from "./login/services/identityService";
-import { LogoutButton } from "./logout/logout";
+import { LogoutButton } from "./login/logout";
 
 @Component({
 	selector: "app-root",
