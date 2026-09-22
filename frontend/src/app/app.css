@@ -5,18 +5,7 @@
 }
 
 mat-toolbar {
-	background-color: var(--mat-sys-secondary);
-	color: var(--mat-sys-on-secondary);
-
-	& mat-icon {
-		color: var(--mat-sys-on-secondary);
-	}
-
 	margin-bottom: 8px;
-
-	& [mat-button] {
-		color: var(--mat-sys-on-secondary);
-	}
 }
 
 .spacer {

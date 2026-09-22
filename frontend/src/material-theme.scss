@@ -31,4 +31,9 @@ body {
 	// Reset the user agent margin.
 	margin: 0;
 	height: 100%;
+
+	@include mat.toolbar-overrides((
+			container-background-color: var(--mat-sys-secondary),
+			container-text-color: var(--mat-sys-on-secondary),
+		))
 }
