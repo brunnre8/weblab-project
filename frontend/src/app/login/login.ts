@@ -5,6 +5,8 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
 import { Router } from "@angular/router";
+import { IdendityService } from "./services/identityService";
+import { User } from "../models/user";
 
 interface LoginData {
 	email: string;
@@ -32,21 +34,19 @@ export class Login {
 
 	private http = inject(HttpClient);
 	private router = inject(Router);
+	private idService = inject(IdendityService);
 
 	onSubmit(ev: SubmitEvent) {
 		ev.preventDefault();
 		const credentials = this.loginModel();
 		this.http
-			.post(
-				"/auth/login",
-				{
-					email: credentials.email,
-					password: credentials.password,
-				},
-				{ responseType: "text" },
-			)
+			.post("/auth/login", {
+				email: credentials.email,
+				password: credentials.password,
+			})
 			.subscribe({
-				next: () => {
+				next: (user) => {
+					this.idService.store(user as User);
 					this.router.navigate(["/"]);
 				},
 				// TODO: fix error handling
