@@ -6,6 +6,10 @@
 
 mat-toolbar {
 	margin-bottom: 8px;
+
+	& mat-icon {
+		color: var(--mat-sys-on-secondary);
+	}
 }
 
 .spacer {
