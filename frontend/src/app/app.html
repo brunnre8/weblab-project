@@ -7,6 +7,9 @@
 		@if(self && self.role === "admin"){
 		<a routerLink="/users/" mat-button>Users</a>
 		}
+		@if(self){
+		<app-logout-btn></app-logout-btn>
+		}
 	</mat-toolbar>
 </header>
 <router-outlet />
