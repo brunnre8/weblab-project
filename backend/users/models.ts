@@ -28,7 +28,7 @@ const UserInputSchema = z.compile(
 export function verifyUserInput(input: Partial<User>): UserInput {
 	const ret = UserInputSchema.safeParse(input);
 	if (!ret.success) {
-		throw new ErrBadInput("bad input for todo", { cause: ret.error });
+		throw new ErrBadInput("bad input for user", { cause: ret.error });
 	}
 	return ret.data;
 }
