@@ -1,0 +1,35 @@
+<h2 mat-dialog-title>Edit user</h2>
+<form id="editForm" (submit)="onSubmit($event)" novalidate>
+	<mat-form-field>
+		<mat-label>Name</mat-label>
+		<input matInput type="text" [formField]="userForm.name" />
+		@if (userForm.name().touched() && userForm.name().invalid()) {
+		<mat-error>
+			{{userForm.name().errors()[0].message}}
+		</mat-error>
+		}
+	</mat-form-field>
+	<mat-form-field>
+		<mat-label>Email</mat-label>
+		<input matInput type="text" [formField]="userForm.email" />
+		@if (userForm.email().touched() && userForm.email().invalid()) {
+		<mat-error>
+			{{userForm.email().errors()[0].message}}
+		</mat-error>
+		}
+	</mat-form-field>
+	<mat-form-field>
+		<mat-label>Role</mat-label>
+		<mat-select [formField]="userForm.role">
+			@for (role of userRoles; track role){
+			<mat-option [value]="role">{{role}}</mat-option>
+			}
+		</mat-select>
+	</mat-form-field>
+	<mat-checkbox [formField]="userForm.disabled">Disabled</mat-checkbox>
+</form>
+<mat-dialog-actions align="start">
+	<button matButton="filled" type="submit" form="editForm"
+		[disabled]="!userForm().dirty() || userForm().invalid()">Submit</button>
+	<button matButton [mat-dialog-close]="undefined">Cancel</button>
+</mat-dialog-actions>
