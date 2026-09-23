@@ -48,6 +48,7 @@ export class Login {
 			})
 			.subscribe({
 				next: (user) => {
+					this.snackbar.dismiss();
 					this.idService.store(user as User);
 					this.router.navigate(["/"]);
 				},
