@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Component, inject, signal } from "@angular/core";
 import { email, form, FormField, minLength, required } from "@angular/forms/signals";
 import { MatButtonModule } from "@angular/material/button";
@@ -7,6 +7,7 @@ import { MatInputModule } from "@angular/material/input";
 import { Router } from "@angular/router";
 import { IdendityService } from "./services/identityService";
 import { User } from "../models/user";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 interface LoginData {
 	email: string;
@@ -35,6 +36,7 @@ export class Login {
 	private http = inject(HttpClient);
 	private router = inject(Router);
 	private idService = inject(IdendityService);
+	private snackbar = inject(MatSnackBar);
 
 	onSubmit(ev: SubmitEvent) {
 		ev.preventDefault();
@@ -50,7 +52,15 @@ export class Login {
 					this.router.navigate(["/"]);
 				},
 				// TODO: fix error handling
-				error: (err) => console.log(err),
+				error: (err) => {
+					let msg: string;
+					if (err instanceof HttpErrorResponse && err.status === 401) {
+						msg = "Invalid credentials";
+					} else {
+						msg = (err as any).message;
+					}
+					this.snackbar.open(`ERROR: ${msg}`, "Close", { politeness: "assertive" });
+				},
 			});
 	}
 }
