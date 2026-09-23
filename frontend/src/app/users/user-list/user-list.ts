@@ -93,7 +93,7 @@ function verifyHasAdminLeft(users: User[], user: User) {
 		throw new Error("bogus user input from dialog");
 	}
 	if (original.role === "admin") {
-		if (!users.filter((a) => a.id !== user.id).find((u) => u.role === "admin")) {
+		if (!users.filter((a) => a.id !== user.id && !a.disabled).find((u) => u.role === "admin")) {
 			throw new Error("change would remove last admin, can't do that");
 		}
 	}
