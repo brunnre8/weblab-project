@@ -102,7 +102,6 @@ export class UserService {
 	}
 }
 function verifyPasswordRequirements(password: string) {
-	// TODO: mirror in client
 	if (/\s/.test(password)) {
 		throw new ErrBadInput("password contains whitespace characters");
 	}
