@@ -1,6 +1,6 @@
 import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { EnvironmentInjector, inject, Service } from "@angular/core";
-import { parseUserArray, User } from "../../models/user";
+import { parseUser, parseUserArray, User } from "../../models/user";
 import { firstValueFrom, map } from "rxjs";
 
 @Service()
@@ -22,18 +22,14 @@ export class UserService {
 		);
 	}
 
-	async addUser(user: Omit<User, "id">, password: string): Promise<void> {
+	async addUser(user: Omit<User, "id">, password: string): Promise<User> {
 		return firstValueFrom(
 			this.#http
-				.post(
-					"/api/users/new",
-					{
-						user,
-						password,
-					},
-					{ responseType: "text" },
-				)
-				.pipe(map(() => undefined)),
+				.post("/api/users/new", {
+					user,
+					password,
+				})
+				.pipe(map((u) => parseUser(u))),
 		);
 	}
 
