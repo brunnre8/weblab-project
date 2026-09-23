@@ -9,7 +9,7 @@ export class CookieHelper {
 
 	cookieName(name: string): string {
 		if (this.#insecure) {
-			return `Http-${name}`;
+			return `${name}`;
 		}
 		return `__Host-Http-${name}`;
 	}
