@@ -4,15 +4,20 @@ import { createExpressApp } from "./express_setup.ts";
 import { UserCreds } from "./users/models.ts";
 import { dummyTodos } from "./dummyTodos.ts";
 import { genRandom } from "./auth/service.ts";
+import { mkdir } from "node:fs/promises";
+import path from "node:path";
 
 async function main() {
-	const store = new SqliteStore("./.state/store.sqlite");
+	const statedir = process.env.TODO_STATE_DIR ?? ".state";
+	await mkdir(statedir, { recursive: true });
+	const store = new SqliteStore(path.join(statedir, "store.sqlite"));
 
 	if (!(await store.hasUsers())) {
 		await populateAdmin(store);
 	}
 
-	const app = createExpressApp(store, store);
+	const insecure = !!process.env.TODO_INSECURE_COOKIES;
+	const app = createExpressApp(store, store, insecure);
 
 	const server = app.listen(4444, (err) => {
 		if (err) {
