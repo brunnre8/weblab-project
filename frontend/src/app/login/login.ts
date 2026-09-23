@@ -55,8 +55,14 @@ export class Login {
 				// TODO: fix error handling
 				error: (err) => {
 					let msg: string;
-					if (err instanceof HttpErrorResponse && err.status === 401) {
-						msg = "Invalid credentials";
+					if (err instanceof HttpErrorResponse) {
+						if (err.status === 401) {
+							msg = "Invalid credentials";
+						} else if (err.status === 403) {
+							msg = "Account disabled, you can't log in";
+						} else {
+							msg = err.message;
+						}
 					} else {
 						msg = (err as any).message;
 					}
