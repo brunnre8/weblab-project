@@ -54,16 +54,16 @@ export class AuthService {
 async function newAuthToken(id: UserID): Promise<AuthToken> {
 	return {
 		userID: id,
-		token: await genRandom(),
+		token: await genRandom(TOKEN_BYTES),
 		createdAt: new Date(),
 	};
 }
 
 const TOKEN_BYTES = 64;
 
-async function genRandom(): Promise<string> {
+export async function genRandom(numBytes: number): Promise<string> {
 	return new Promise((resolve, reject) => {
-		randomBytes(TOKEN_BYTES, (err, buf) => {
+		randomBytes(numBytes, (err, buf) => {
 			if (err) {
 				reject(err);
 				return;

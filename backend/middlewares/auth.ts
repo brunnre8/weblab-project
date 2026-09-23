@@ -60,13 +60,3 @@ export function adminOnlyMw(): RequestHandler {
 		next();
 	};
 }
-
-export function dummyAdminUser(): User {
-	return {
-		id: 1,
-		name: "admin",
-		role: "admin",
-		email: "admin@localhost",
-		disabled: false,
-	};
-}
