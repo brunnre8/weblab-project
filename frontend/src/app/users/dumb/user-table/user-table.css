@@ -1,21 +1,6 @@
-.container {
-	margin-inline: 10px;
+:host {
+	display: block;
 	max-width: 1000px;
-
-	@media(max-width: 500px) {
-		margin-inline: 0px;
-	}
-
-	@media(min-width: 1020px) {
-		margin-inline: auto;
-	}
-}
-
-.container>h1,
-.container>p {
-	@media(max-width: 500px) {
-		margin-inline: 10px;
-	}
 }
 
 tr.user-is-disabled {

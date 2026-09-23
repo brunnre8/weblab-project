@@ -1,12 +1,8 @@
-<div class="container">
-	<h1>User management</h1>
-	<p>Click on a user to modify</p>
-	<table mat-table [dataSource]="sortedUsers()">
-		@for(col of displayedCols; track $index) {
-		<mat-text-column [name]="col"></mat-text-column>
-		}
-		<tr mat-header-row *matHeaderRowDef="displayedCols"></tr>
-		<tr mat-row [class.user-is-disabled]="row.disabled" *matRowDef="let row; columns: displayedCols;"
-			(click)="onClick(row)"></tr>
-	</table>
-</div>
+<table mat-table [dataSource]="sortedUsers()">
+	@for(col of displayedCols; track $index) {
+	<mat-text-column [name]="col"></mat-text-column>
+	}
+	<tr mat-header-row *matHeaderRowDef="displayedCols"></tr>
+	<tr mat-row [class.user-is-disabled]="row.disabled" *matRowDef="let row; columns: displayedCols;"
+		(click)="onClick(row)"></tr>
+</table>
