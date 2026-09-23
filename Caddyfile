@@ -16,7 +16,7 @@ localhost:4200 {
 	handle /robots.txt {
 		respond <<EOF
 		user-agent: *
-		disallow: /"
+		disallow: /
 		EOF 200
 	}
 	# frontend
