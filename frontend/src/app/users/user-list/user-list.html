@@ -1,5 +1,8 @@
 <div class='container'>
 	<h1>User management</h1>
+	<div>
+		<button matButton (click)="onNewBtn()"><mat-icon>add</mat-icon>Add new</button>
+	</div>
 	@if(userRes.isLoading()){
 	<div class='loader'>
 		<mat-spinner [diameter]="50"></mat-spinner>

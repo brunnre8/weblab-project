@@ -4,16 +4,21 @@ import { UserService } from "../services/user";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { User } from "../../models/user";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatButtonModule } from "@angular/material/button";
+import { MatIconModule } from "@angular/material/icon";
+import { MatDialog } from "@angular/material/dialog";
+import { UserNewData, UserTableNewDialog } from "../dumb/user-table-new-dialog/user-table-new-dialog";
 
 @Component({
 	selector: "app-user-list",
-	imports: [UserTable, MatProgressSpinnerModule],
+	imports: [UserTable, MatProgressSpinnerModule, MatButtonModule, MatIconModule],
 	templateUrl: "./user-list.html",
 	styleUrl: "./user-list.css",
 })
 export class UserList {
 	#userService = inject(UserService);
 	#snackbar = inject(MatSnackBar);
+	#newDialog = inject(MatDialog);
 
 	userRes = this.#userService.allUsers();
 
@@ -33,7 +38,38 @@ export class UserList {
 		this.#snackbar.open(`successfully updated ${user.name}`, "Close", { duration: 5000 });
 		this.userRes.reload();
 	}
+
+	onNewBtn() {
+		const dialogRef = this.#newDialog.open<UserTableNewDialog, undefined, UserNewData>(UserTableNewDialog);
+		dialogRef.afterClosed().subscribe(async (data: UserNewData | undefined) => {
+			if (!data) {
+				return;
+			}
+			await this.handleNewUser(data);
+		});
+	}
+
+	async handleNewUser(data: UserNewData) {
+		try {
+			await this.#userService.addUser(
+				{
+					name: data.name,
+					email: data.email,
+					role: data.role,
+					disabled: data.disabled,
+				},
+				data.password,
+			);
+		} catch (err) {
+			const msg = (err as any).message || "unknown error occured";
+			this.#snackbar.open(`ERROR: ${msg}`, "Close", { politeness: "assertive" });
+			return;
+		}
+		this.#snackbar.open(`successfully created ${data.name}`, "Close", { duration: 5000 });
+		this.userRes.reload();
+	}
 }
+
 function verifyHasAdminLeft(users: User[], user: User) {
 	const original = users.find((u) => u.id === user.id);
 	if (!original) {

@@ -22,32 +22,22 @@ export class UserService {
 		);
 	}
 
-	// getTodo(id: Signal<TodoID>): Resource<Todo | undefined> {
-	// 	return httpResource<Todo>(() => `/api/todos/${id()}`, { parse: parseTodo, injector: this.#injector }).asReadonly();
-	// }
-	//
+	async addUser(user: Omit<User, "id">, password: string): Promise<void> {
+		return firstValueFrom(
+			this.#http
+				.post(
+					"/api/users/new",
+					{
+						user,
+						password,
+					},
+					{ responseType: "text" },
+				)
+				.pipe(map(() => undefined)),
+		);
+	}
+
 	// async deleteTodo(id: TodoID): Promise<void> {
 	// 	return firstValueFrom(this.#http.delete(`/api/todos/${id}`, { responseType: "text" }).pipe(map(() => undefined)));
-	// }
-	//
-	// async updateTodo(todo: TodoUpdate): Promise<void> {
-	// 	return firstValueFrom(
-	// 		this.#http.put(`/api/todos/${todo.id}`, todo, { responseType: "text" }).pipe(map(() => undefined)),
-	// 	);
-	// }
-	//
-	// async addTodo(todo: TodoInsert): Promise<void> {
-	// 	return firstValueFrom(
-	// 		this.#http
-	// 			.post(
-	// 				"/api/todos/new",
-	// 				{
-	// 					title: todo.title,
-	// 					body: todo.body,
-	// 				},
-	// 				{ responseType: "text" },
-	// 			)
-	// 			.pipe(map(() => undefined)),
-	// 	);
 	// }
 }
