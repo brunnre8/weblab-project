@@ -4,7 +4,7 @@ import { TodoGrid } from "./todos/todo-grid/todo-grid";
 import { TodoNew } from "./todos/todo-new/todo-new";
 import { TodoEdit } from "./todos/todo-edit/todo-edit";
 import { TodoSingle } from "./todos/todo-single/todo-single";
-import { UserTable } from "./users/dumb/user-table/user-table";
+import { UserList } from "./users/user-list/user-list";
 
 export const routes: Routes = [
 	{
@@ -35,6 +35,6 @@ export const routes: Routes = [
 	{
 		path: "users",
 		title: "user list",
-		component: UserTable,
+		component: UserList,
 	},
 ];

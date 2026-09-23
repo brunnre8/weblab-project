@@ -1,18 +1,25 @@
-import { HttpClient, httpResource } from "@angular/common/http";
-import { EnvironmentInjector, inject, Resource, Service, Signal } from "@angular/core";
+import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
+import { EnvironmentInjector, inject, Service } from "@angular/core";
 import { parseUserArray, User } from "../../models/user";
+import { firstValueFrom, map } from "rxjs";
 
 @Service()
 export class UserService {
 	#http = inject(HttpClient);
 	#injector = inject(EnvironmentInjector);
 
-	allUsers(): Resource<User[]> {
+	allUsers(): HttpResourceRef<User[]> {
 		return httpResource<User[]>(() => "/api/users/", {
 			defaultValue: [],
 			parse: parseUserArray,
 			injector: this.#injector,
-		}).asReadonly();
+		});
+	}
+
+	updateUser(user: User): Promise<void> {
+		return firstValueFrom(
+			this.#http.put(`/api/users/${user.id}`, user, { responseType: "text" }).pipe(map(() => undefined)),
+		);
 	}
 
 	// getTodo(id: Signal<TodoID>): Resource<Todo | undefined> {

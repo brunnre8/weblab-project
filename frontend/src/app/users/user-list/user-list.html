@@ -1,0 +1,9 @@
+@if(userRes.isLoading()){
+<div class='loader'>
+	<mat-spinner [diameter]="50"></mat-spinner>
+</div>
+} @else if (userRes.error()){
+<p>{{userRes.error()?.message ?? "unkown error"}}</p>
+} @else if (userRes.hasValue()){
+<app-user-table [users]="userRes.value()" (change)="onUserEdit($event)"></app-user-table>
+}
