@@ -17,7 +17,7 @@ describe("todo service check", () => {
 	beforeEach(async () => {
 		sqliteStore = new SqliteStore(":memory:");
 		[admin, billy, maria] = await populateDummy(sqliteStore);
-		service = new UserService(sqliteStore);
+		service = new UserService(sqliteStore, sqliteStore);
 	});
 
 	afterEach(() => {

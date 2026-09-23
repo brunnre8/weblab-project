@@ -29,7 +29,7 @@ export function createExpressApp(
 	const app = express();
 	app.disable("x-powered-by");
 
-	const userService = new UserService(store);
+	const userService = new UserService(store, tokenStore);
 	const authService = new AuthService(userService, tokenStore);
 	const cookieHelper = new CookieHelper(!!insecure);
 

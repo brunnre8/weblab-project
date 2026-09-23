@@ -1,3 +1,4 @@
+import type { AuthTokenStore } from "../auth/tokenStore.ts";
 import { ErrBadInput } from "../helpers/conversions.ts";
 import { ErrConflict, ErrNoEnt } from "../middlewares/errors.ts";
 import { ErrConstraint, ErrNoRows } from "../stores/errors.ts";
@@ -6,9 +7,11 @@ import { type UserStore } from "./userStore.ts";
 
 export class UserService {
 	#userStore: UserStore;
+	#tokenStore: AuthTokenStore;
 
-	constructor(userStore: UserStore) {
+	constructor(userStore: UserStore, tokenStore: AuthTokenStore) {
 		this.#userStore = userStore;
+		this.#tokenStore = tokenStore;
 	}
 
 	async listUsers(): Promise<User[]> {
@@ -69,6 +72,9 @@ export class UserService {
 				id: original.id,
 			};
 			await this.#userStore.updateUser(updated);
+			if (!original.disabled && updated.disabled) {
+				await this.#tokenStore.deleteAllAuthTokens(original.id);
+			}
 		} catch (err) {
 			if (err instanceof ErrNoRows) {
 				throw new ErrNoEnt("no such user", { cause: err });

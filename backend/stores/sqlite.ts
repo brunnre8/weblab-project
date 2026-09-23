@@ -31,7 +31,6 @@ export class SqliteStore implements UserStore, TodoStore, AuthTokenStore {
 		this.runPragmas();
 		this.migrate();
 	}
-
 	async getUserById(id: UserID): Promise<User> {
 		const val = this.#sql.get`SELECT * from users WHERE id = ${id}`;
 		if (val === undefined) {
@@ -176,6 +175,13 @@ export class SqliteStore implements UserStore, TodoStore, AuthTokenStore {
 		if (changes.changes != 1) {
 			throw new ErrNoRows(`no token with val ${token}`);
 		}
+	}
+
+	async deleteAllAuthTokens(userID: UserID): Promise<void> {
+		this.#sql.run`
+			DELETE FROM auth_tokens
+			WHERE userid = ${userID};
+		`;
 	}
 
 	async getAuthToken(token: AuthTokenString): Promise<AuthToken> {
