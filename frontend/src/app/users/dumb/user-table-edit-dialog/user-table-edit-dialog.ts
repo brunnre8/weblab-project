@@ -7,6 +7,13 @@ import { MatInputModule } from "@angular/material/input";
 import { email, form, FormField, required } from "@angular/forms/signals";
 import { MatSelectModule } from "@angular/material/select";
 import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatIconModule } from "@angular/material/icon";
+import { MatExpansionModule } from "@angular/material/expansion";
+
+export interface EditDialogReply {
+	type: "edit" | "delete";
+	user: User;
+}
 
 @Component({
 	selector: "app-user-table-edit-dialog",
@@ -17,6 +24,8 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
 		MatInputModule,
 		MatSelectModule,
 		MatCheckboxModule,
+		MatExpansionModule,
+		MatIconModule,
 		FormField,
 	],
 	templateUrl: "./user-table-edit-dialog.html",
@@ -24,7 +33,7 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
 })
 export class UserTableEditDialog {
 	user = inject<User>(MAT_DIALOG_DATA);
-	dialog = inject<MatDialogRef<this, User>>(MatDialogRef);
+	dialog = inject<MatDialogRef<this, EditDialogReply>>(MatDialogRef);
 	userModel = signal(this.user);
 	userForm = form(this.userModel, (schema) => {
 		required(schema.name, { message: "name is required" });
@@ -33,12 +42,24 @@ export class UserTableEditDialog {
 	});
 	userRoles = userRoles;
 
+	onDelete(ev: PointerEvent) {
+		ev.preventDefault();
+		ev.stopImmediatePropagation();
+		this.dialog.close({
+			type: "delete",
+			user: this.user,
+		});
+	}
+
 	onSubmit(ev: SubmitEvent) {
 		ev.preventDefault();
 		ev.stopImmediatePropagation();
 		this.dialog.close({
-			...this.user,
-			...this.userModel(),
+			type: "edit",
+			user: {
+				...this.user,
+				...this.userModel(),
+			},
 		});
 	}
 }

@@ -2,7 +2,7 @@ import { Component, computed, inject, input, output } from "@angular/core";
 import { MatTableModule } from "@angular/material/table";
 import { User } from "../../../models/user";
 import { MatDialog } from "@angular/material/dialog";
-import { UserTableEditDialog } from "../user-table-edit-dialog/user-table-edit-dialog";
+import { EditDialogReply, UserTableEditDialog } from "../user-table-edit-dialog/user-table-edit-dialog";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 
@@ -27,20 +27,22 @@ export class UserTable {
 	delete = output<User>();
 
 	onClick(user: User) {
-		const dialogRef = this.editDialog.open<UserTableEditDialog, User, User>(UserTableEditDialog, {
+		const dialogRef = this.editDialog.open<UserTableEditDialog, User, EditDialogReply>(UserTableEditDialog, {
 			data: user,
 		});
-		dialogRef.afterClosed().subscribe((user: User | undefined) => {
-			if (!user) {
+		dialogRef.afterClosed().subscribe((reply: EditDialogReply | undefined) => {
+			if (!reply) {
 				return;
 			}
-			this.change.emit(user);
+			switch (reply.type) {
+				case "edit": {
+					this.change.emit(reply.user);
+					return;
+				}
+				case "delete": {
+					this.delete.emit(reply.user);
+				}
+			}
 		});
-	}
-
-	onDelete(ev: PointerEvent, user: User) {
-		ev.preventDefault();
-		ev.stopImmediatePropagation();
-		this.delete.emit(user);
 	}
 }

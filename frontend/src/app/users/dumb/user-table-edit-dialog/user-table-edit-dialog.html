@@ -28,6 +28,13 @@
 	</mat-form-field>
 	<mat-checkbox [formField]="userForm.disabled">Disabled</mat-checkbox>
 </form>
+<mat-expansion-panel>
+	<mat-expansion-panel-header>
+		<mat-panel-title>Danger zone</mat-panel-title>
+	</mat-expansion-panel-header>
+	<p>Caution, this can't be undone</p>
+	<button matButton="outlined" (click)="onDelete($event)"><mat-icon>delete</mat-icon>Delete user</button>
+</mat-expansion-panel>
 <mat-dialog-actions align="start">
 	<button matButton="filled" type="submit" form="editForm"
 		[disabled]="!userForm().dirty() || userForm().invalid()">Submit</button>
