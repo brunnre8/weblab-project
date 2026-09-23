@@ -44,7 +44,7 @@ export class SqliteStore implements UserStore, TodoStore, AuthTokenStore {
 		const val = this.#sql.get`
 			SELECT * from user_creds
 			WHERE userid in (
-				SELECT userid from users
+				SELECT id from users
 				where email = ${email}
 			);
 		`;
