@@ -93,7 +93,7 @@ export class SqliteStore implements UserStore, TodoStore, AuthTokenStore {
 		return row !== undefined;
 	}
 
-	async insertUser(user: User, creds?: UserCreds): Promise<UserID> {
+	async insertUser(user: Omit<User, "id">, creds?: UserCreds): Promise<UserID> {
 		this.#db.exec("BEGIN TRANSACTION;");
 		try {
 			const row = this.#sql.get`
