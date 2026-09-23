@@ -18,7 +18,7 @@ const TodoInputSchema = z.compile(
 	z.object({
 		title: z.string(),
 		body: z.string(),
-		createdAt: z.coerce.date().default(new Date()),
+		createdAt: z.coerce.date().default(() => new Date()),
 	}),
 );
 
