@@ -1,6 +1,6 @@
 import { HttpClient, httpResource, HttpResourceRef } from "@angular/common/http";
 import { EnvironmentInjector, inject, Service } from "@angular/core";
-import { parseUser, parseUserArray, User } from "../../models/user";
+import { parseUser, parseUserArray, User, UserID } from "../../models/user";
 import { firstValueFrom, map } from "rxjs";
 
 @Service()
@@ -33,7 +33,7 @@ export class UserService {
 		);
 	}
 
-	// async deleteTodo(id: TodoID): Promise<void> {
-	// 	return firstValueFrom(this.#http.delete(`/api/todos/${id}`, { responseType: "text" }).pipe(map(() => undefined)));
-	// }
+	async deleteUser(id: UserID): Promise<void> {
+		return firstValueFrom(this.#http.delete(`/api/users/${id}`, { responseType: "text" }).pipe(map(() => undefined)));
+	}
 }

@@ -2,7 +2,18 @@
 	@for(col of displayedCols; track $index) {
 	<mat-text-column [name]="col"></mat-text-column>
 	}
-	<tr mat-header-row *matHeaderRowDef="displayedCols"></tr>
-	<tr mat-row [class.user-is-disabled]="row.disabled" *matRowDef="let row; columns: displayedCols;"
+
+	<ng-container matColumnDef="actions">
+		<th mat-header-cell *matHeaderCellDef>Actions</th>
+		<td mat-cell *matCellDef="let row">
+			<button matIconButton aria-label="Delete user" (click)="onDelete($event, row)">
+				<mat-icon>delete</mat-icon>
+			</button>
+		</td>
+	</ng-container>
+
+	@let colsWithActions = [...displayedCols, 'actions'];
+	<tr mat-header-row *matHeaderRowDef="colsWithActions"></tr>
+	<tr mat-row [class.user-is-disabled]="row.disabled" *matRowDef="let row; columns: colsWithActions;"
 		(click)="onClick(row)"></tr>
 </table>

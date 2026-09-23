@@ -39,6 +39,23 @@ export class UserList {
 		this.userRes.reload();
 	}
 
+	async onUserDelete(user: User) {
+		try {
+			if (!this.userRes.hasValue()) {
+				console.log("userRes empty, shouldn't happen");
+				return;
+			}
+			verifyHasAdminLeft(this.userRes.value(), user);
+			await this.#userService.deleteUser(user.id);
+		} catch (err) {
+			const msg = (err as any).message || "unknown error occured";
+			this.#snackbar.open(`ERROR: ${msg}`, "Close", { politeness: "assertive" });
+			return;
+		}
+		this.#snackbar.open(`successfully deleted ${user.name}`, "Close", { duration: 5000 });
+		this.userRes.reload();
+	}
+
 	onNewBtn() {
 		const dialogRef = this.#newDialog.open<UserTableNewDialog, undefined, UserNewData>(UserTableNewDialog);
 		dialogRef.afterClosed().subscribe(async (data: UserNewData | undefined) => {
@@ -75,7 +92,7 @@ function verifyHasAdminLeft(users: User[], user: User) {
 	if (!original) {
 		throw new Error("bogus user input from dialog");
 	}
-	if (original.role === "admin" && original.role !== user.role) {
+	if (original.role === "admin") {
 		if (!users.filter((a) => a.id !== user.id).find((u) => u.role === "admin")) {
 			throw new Error("change would remove last admin, can't do that");
 		}
