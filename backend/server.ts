@@ -33,7 +33,7 @@ const dummyTodos = [
 ];
 
 async function main() {
-	const store = new SqliteStore(":memory:");
+	const store = new SqliteStore("./.state/store.sqlite");
 
 	if (!(await store.hasUsers())) {
 		const adminID = await store.insertUser(dummyAdminUser(), await UserCreds.fromPassword("admin".repeat(3)));
