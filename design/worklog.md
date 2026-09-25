@@ -1,27 +1,100 @@
-### Aug 31:
+## Summary
 
-17:00 - 22:00
+### Aug 31:
 
 Research about Oauth / OIDC , CSRF protection, session / cookie handling
 
-### Sep 04:
+total: ~5h
 
-15:00 - 16:00
+### Sep 04:
 
 Typescript setup of backend
 
+total: ~1h
+
 ### Sep 05:
-
-08:00 - 15:30
-
 setup sqlite DB / models / interfaces for the store / credential check functions
 
+Total: ~6h
+
 ### Sep 06:
-10:00 - 20:40
 
 implement user and todo stores / todo controller, service and corresponding tests / server integration test
 
-### Detailed log
+total: ~10h
+
+### Sep 07:
+
+user input validation and user creds handling
+
+total: ~1h
+
+### Sep 12:
+
+user service implementation and testing
+
+total: ~10h
+
+
+### Sep 13:
+
+CSRF handling (and research), various backend fixes
+
+total: ~8h
+
+### Sep 15:
+
+Auth service progress
+
+total: ~1h
+
+### Sep 18:
+
+Auth service progress / login setup
+
+total ~7h
+
+
+### Sep 19:
+
+Frontend setup / todo progress
+
+total: ~6h
+
+### Sep 20:
+
+todo edit / auth / navigation
+
+total: ~10h
+
+### Sep 21:
+
+New todo / /auth/self implementation / title fixes
+
+total: ~1h
+
+
+### Sep 22:
+
+Keep track of user in fe / theming / login, logout
+
+total: ~1h
+
+### Sep 23:
+
+user edit form / new user form / fighting against my reverse proxy / lighthouse
+
+total: ~11h
+
+
+### Sep 25:
+
+Compose setup / podman setup (didn't use docker/podman) / architecture documentation
+
+total: >6h
+
+
+## Commit log
 `git shortlog --group=format:%as --format="%aD %s" --date=format:%R`
 
 2026-08-31 (6):
@@ -244,7 +317,7 @@ implement user and todo stores / todo controller, service and corresponding test
       Tue, 22 Sep 2026 14:27:23 +0200 move logout to login feature
       Tue, 22 Sep 2026 14:31:32 +0200 remove feature folder indirection
 
-2026-09-23 (24):
+2026-09-23 (25):
       Wed, 23 Sep 2026 10:30:48 +0200 basic user list mock
       Wed, 23 Sep 2026 10:56:16 +0200 try to fit user table on the screen
       Wed, 23 Sep 2026 14:14:50 +0200 eslint: shut up
@@ -269,3 +342,26 @@ implement user and todo stores / todo controller, service and corresponding test
       Wed, 23 Sep 2026 20:20:41 +0200 server: allow db location / secure setup via env vars
       Wed, 23 Sep 2026 22:00:03 +0200 lighthouse problems
       Wed, 23 Sep 2026 22:00:55 +0200 add caddyfile for local runs
+      Wed, 23 Sep 2026 22:47:10 +0200 worklog
+
+2026-09-24 (6):
+      Thu, 24 Sep 2026 00:05:10 +0200 user list: ensure it's really centered
+      Thu, 24 Sep 2026 00:17:33 +0200 zod: default value needs to be a function
+      Thu, 24 Sep 2026 00:25:24 +0200 insecure cookies: don't pretend
+      Thu, 24 Sep 2026 00:48:00 +0200 clear auth token when user is disabled
+      Thu, 24 Sep 2026 00:54:15 +0200 rm todo
+      Thu, 24 Sep 2026 00:57:58 +0200 fix caddyfile
+
+2026-09-25 (11):
+      Fri, 25 Sep 2026 08:30:26 +0200 implement token expiry
+      Fri, 25 Sep 2026 09:42:07 +0200 server: listen for SIGINT and SIGTERM
+      Fri, 25 Sep 2026 10:05:17 +0200 unused file from template
+      Fri, 25 Sep 2026 11:11:56 +0200 docker stuff
+      Fri, 25 Sep 2026 11:50:05 +0200 remove gruvbox css
+      Fri, 25 Sep 2026 12:14:19 +0200 architektur
+      Fri, 25 Sep 2026 13:44:15 +0200 fix partial gruvbox removal
+      Fri, 25 Sep 2026 13:45:14 +0200 Revert "unused file from template"
+      Fri, 25 Sep 2026 13:51:31 +0200 README
+      Fri, 25 Sep 2026 13:52:56 +0200 typo
+      Fri, 25 Sep 2026 14:00:18 +0200 fazit
+
