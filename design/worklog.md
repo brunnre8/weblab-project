@@ -1,5 +1,7 @@
 ## Summary
 
+Total: >60h (84-ish, lots spent researching / trying different things)
+
 ### Aug 31:
 
 Research about Oauth / OIDC , CSRF protection, session / cookie handling

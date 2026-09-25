@@ -9,6 +9,8 @@ Da ich sqlite schon kannte, war die Wahl der DB Technologie zweckmässig.
 
 Ich wusste so ca. wie ich das ganze Strukturieren sollte mit den Controllern / Services etc.
 
+Ich hab sehr viel gelernt, sowohl über angular, html/css als auch generell über Authentifizierungs-Mechanismen.
+
 ## Wo lagen die Herausforderungen?
 
 Eh... man kann es zusammenfassen mit folgendem Zitat:
