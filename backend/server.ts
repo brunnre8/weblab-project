@@ -30,13 +30,22 @@ async function main() {
 		}
 	});
 
-	process.on("SIGTERM", () => {
-		console.log("SIGTERM signal received. Shutting down...");
+	function shutdown() {
 		server.close(() => {
 			console.log("HTTP server closed");
 			store.close();
 			console.log("Store closed");
 		});
+	}
+
+	process.on("SIGINT", () => {
+		console.log("SIGINT signal received. Shutting down...");
+		shutdown();
+	});
+
+	process.on("SIGTERM", () => {
+		console.log("SIGTERM signal received. Shutting down...");
+		shutdown();
 	});
 }
 
