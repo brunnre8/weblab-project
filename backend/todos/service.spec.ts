@@ -49,8 +49,6 @@ describe("todo service check", () => {
 
 		test("delete", async () => {
 			const todo = (await sqliteStore.listTodos(billy.id))[0];
-			todo.title = "new title";
-			todo.body = "new body";
 			await service.deleteTodo(todo.id, billy);
 			await expect(service.listTodos(billy.id)).resolves.toHaveLength(0);
 		});

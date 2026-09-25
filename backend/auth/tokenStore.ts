@@ -9,7 +9,7 @@ export interface AuthToken {
 }
 
 export interface AuthTokenStore {
-	//generate and store AuthToken for user
+	// store AuthToken for user
 	addAuthToken(token: AuthToken): Promise<void>;
 
 	// delete token
