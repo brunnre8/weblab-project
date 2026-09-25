@@ -99,6 +99,7 @@ total: >6h
 ## Commit log
 `git shortlog --group=format:%as --format="%aD %s" --date=format:%R`
 
+```
 2026-08-31 (6):
       Mon, 31 Aug 2026 12:39:19 +0200 scaffold
       Mon, 31 Aug 2026 12:55:00 +0200 rename
@@ -366,4 +367,4 @@ total: >6h
       Fri, 25 Sep 2026 13:51:31 +0200 README
       Fri, 25 Sep 2026 13:52:56 +0200 typo
       Fri, 25 Sep 2026 14:00:18 +0200 fazit
-
+```
