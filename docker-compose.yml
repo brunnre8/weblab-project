@@ -1,0 +1,23 @@
+services:
+  rpb-weblab-backend:
+    container_name: rpb-weblab-backend
+    build:
+        context: ./backend
+    # Documents the internal API Port of the container - does not publish it to the host
+    expose:
+      - "4444"
+    # Enable if needed: Exposes the containers internal Port 4566 to the host system through port 8080
+    #ports:
+    #  - "8080:4566" # if internal port needs to be mapped to a port on the host system
+
+  rpb-weblab-frontend:
+    container_name: rpb-weblab-frontend
+    build:
+        context: ./frontend
+    # Exposes the containers internal Port 80 (right) to the host system through port 80 (left)
+    ports:
+      - "4200:4200" # exposes port 80 to the host system
+    depends_on:
+      - rpb-weblab-backend
+    environment:
+       - TODO_INSECURE_COOKIES=1

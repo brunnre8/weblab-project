@@ -1,0 +1,29 @@
+{
+	admin off
+	skip_install_trust
+	auto_https off
+}
+
+http://localhost:4200 {
+	@backend {
+		path /api/* /auth/*
+	}
+	handle @backend {
+		reverse_proxy @backend rpb-weblab-backend:4444
+		encode
+	}
+
+	handle /robots.txt {
+		respond <<EOF
+		user-agent: *
+		disallow: /
+		EOF 200
+	}
+	# frontend
+	handle {
+		root /srv/
+		try_files {path} /index.html
+		file_server
+		encode
+	}
+}
