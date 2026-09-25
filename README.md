@@ -17,7 +17,7 @@ Note: the compose file is only meant as a showcase and not as a means of deploym
 
 ### Manual
 
-Run both frontend and backens with:
+Run both frontend and backend with:
 
 ```
 npm run start
