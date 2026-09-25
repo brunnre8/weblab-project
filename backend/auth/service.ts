@@ -36,6 +36,10 @@ export class AuthService {
 	async userFromToken(raw: AuthTokenString): Promise<User | null> {
 		try {
 			const token = await this.#tokenStore.getAuthToken(raw);
+			if (isTokenExpired(token)) {
+				await this.#tokenStore.deleteAuthToken(token.token);
+				return null;
+			}
 			const user = await this.#userService.getUser(token.userID);
 			return user;
 		} catch (err) {
@@ -46,8 +50,15 @@ export class AuthService {
 		}
 	}
 
-	async logout(token: AuthTokenString) {
-		this.#tokenStore.deleteAuthToken(token);
+	async logout(token: AuthTokenString): Promise<void> {
+		try {
+			await this.#tokenStore.deleteAuthToken(token);
+		} catch (err) {
+			if (err instanceof ErrNoRows) {
+				throw new ErrNoEnt("no such token", { cause: err });
+			}
+			throw err;
+		}
 	}
 }
 
@@ -71,4 +82,10 @@ export async function genRandom(numBytes: number): Promise<string> {
 			resolve(buf.toString("base64url"));
 		});
 	});
+}
+
+function isTokenExpired(token: AuthToken): boolean {
+	const now = new Date();
+	const delta = now.getTime() - token.createdAt.getTime();
+	return delta > 31 * 24 * 60 * 1000;
 }
